@@ -31,8 +31,6 @@
 #define MODULE_NAME			"wcnss_8960"
 #define MAX_BUF_SIZE			0x51
 
-
-
 static struct delayed_work cancel_vote_work;
 static void *riva_ramdump_dev;
 static int riva_crash;
@@ -175,6 +173,8 @@ static int riva_powerup(const struct subsys_data *subsys)
 	struct platform_device *pdev = wcnss_get_platform_device();
 	struct wcnss_wlan_config *pwlanconfig = wcnss_get_wlan_config();
 	int    ret = -1;
+
+	wcnss_ssr_boot_notify();
 
 	if (pdev && pwlanconfig)
 		ret = wcnss_wlan_power(&pdev->dev, pwlanconfig,
