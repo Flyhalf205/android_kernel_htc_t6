@@ -307,10 +307,12 @@ static struct acpu_level tbl_PVS0_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1275000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1275000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1300000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1325000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1350000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1375000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1400000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -343,10 +345,12 @@ static struct acpu_level tbl_PVS1_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1225000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1225000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1250000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1275000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1300000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1325000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1350000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -379,10 +383,12 @@ static struct acpu_level tbl_PVS2_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1187500 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1187500 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1212500 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1237500 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1262500 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1287500 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1312500 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -415,10 +421,12 @@ static struct acpu_level tbl_PVS3_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1150000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1150000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1175000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1200000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1225000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1250000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1275000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -451,10 +459,12 @@ static struct acpu_level tbl_PVS4_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1125000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1125000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1150000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1175000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1200000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1225000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1250000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -487,10 +497,12 @@ static struct acpu_level tbl_PVS5_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1100000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1100000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1125000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1150000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1175000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1200000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1225000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
@@ -523,10 +535,12 @@ static struct acpu_level tbl_PVS6_1700MHz[] __initdata = {
 	{ 1, {  1782000, HFPLL, 1, 0x42 }, L2(14), 1075000 },
 	{ 1, {  1836000, HFPLL, 1, 0x44 }, L2(14), 1075000 },
 	{ 1, {  1890000, HFPLL, 1, 0x46 }, L2(14), 1100000 },
+#ifdef CONFIG_CPU_OVERCLOCK_ULTIMATE
 	{ 1, {  1944000, HFPLL, 1, 0x48 }, L2(14), 1125000 },
 	{ 1, {  1998000, HFPLL, 1, 0x4A }, L2(14), 1150000 },
 	{ 1, {  2052000, HFPLL, 1, 0x4C }, L2(14), 1175000 },
 	{ 1, {  2106000, HFPLL, 1, 0x4E }, L2(14), 1200000 },
+#endif
 #endif
 	{ 0, { 0 } }
 };
