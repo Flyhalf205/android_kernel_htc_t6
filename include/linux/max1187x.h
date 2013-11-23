@@ -177,5 +177,7 @@ struct max1187x_pdata {
 	struct kobj_attribute *vk2Use;
 };
 
+extern uint8_t touchscreen_is_on(void);
+
 #endif /* __MAX1187X_H */
 
