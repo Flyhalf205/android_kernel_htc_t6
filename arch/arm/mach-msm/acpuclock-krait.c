@@ -38,6 +38,12 @@
 #include "acpuclock-krait.h"
 #include "avs.h"
 
+#ifdef CONFIG_CPU_OVERCLOCK
+#define OVERCLOCK_EXTRA_FREQS	7
+#else
+#define OVERCLOCK_EXTRA_FREQS	0
+#endif
+
 #define CPU_FOOT_PRINT_MAGIC				0xACBDFE00
 static void set_acpuclk_foot_print(unsigned cpu, unsigned state)
 {
