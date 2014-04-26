@@ -253,6 +253,9 @@ enum {
 #ifdef CONFIG_CPU_FREQ_GOV_ONDEMAND_2_PHASE
 int set_two_phase_freq(int cpufreq);
 #endif
+#ifdef CONFIG_CPU_FREQ_GOV_INTELLIDEMAND 
+int id_set_two_phase_freq(int cpufreq);
+#endif
 
 int set_input_event_min_freq_by_cpu(int cpu_nr, int cpufreq);
 
