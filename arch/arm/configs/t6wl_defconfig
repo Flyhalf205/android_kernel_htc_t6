@@ -1483,6 +1483,7 @@ CONFIG_BCMDHD_NVRAM_PATH="/etc/calibration"
 #
 CONFIG_QUALCOMM_WLAN=y
 CONFIG_QUALCOMM_WLAN_PXO=y
+CONFIG_KINETO_GAN=m
 
 #
 # Enable WiMAX (Networking options) to see the WiMAX drivers
