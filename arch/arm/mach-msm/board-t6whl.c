@@ -888,6 +888,9 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.guage_driver = 0,
 	.chg_limit_active_mask = HTC_BATT_CHG_LIMIT_BIT_TALK |
 								HTC_BATT_CHG_LIMIT_BIT_NAVI,
+#ifdef CONFIG_DUTY_CYCLE_LIMIT
+	.chg_limit_timer_sub_mask = HTC_BATT_CHG_LIMIT_BIT_THRML,
+#endif
 	.critical_low_voltage_mv = 3200,
 	.critical_alarm_vol_ptr = critical_alarm_voltage_mv,
 	.critical_alarm_vol_cols = sizeof(critical_alarm_voltage_mv) / sizeof(int),
@@ -935,6 +938,12 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.igauge.store_battery_ui_soc = pm8921_bms_store_battery_ui_soc,
 	.igauge.get_battery_ui_soc = pm8921_bms_get_battery_ui_soc,
 	.igauge.calculate_pj_level = pm8921_calculate_pj_level,
+	.igauge.store_battery_data = pm8921_bms_store_battery_data_emmc,
+	.igauge.store_battery_ui_soc = pm8921_bms_store_battery_ui_soc,
+	.igauge.get_battery_ui_soc = pm8921_bms_get_battery_ui_soc,
+	.igauge.enter_qb_mode = pm8921_bms_enter_qb_mode,
+	.igauge.exit_qb_mode = pm8921_bms_exit_qb_mode,
+	.igauge.qb_mode_pwr_consumption_check = pm8921_qb_mode_pwr_consumption_check,
 	.igauge.is_battery_temp_fault = pm8921_is_batt_temperature_fault,
 	.igauge.is_battery_full = pm8921_is_batt_full,
 	.igauge.is_pj_full = pm8921_is_pj_full,
