@@ -2478,7 +2478,11 @@ static void __pm8921_charger_vbus_draw(unsigned int mA)
 
 #ifdef CONFIG_FORCE_FAST_CHARGE
 		if (force_fast_charge == 1)
+#ifdef CONFIG_ARCH_APQ8064_T6DXG
+			i = 7;
+#else
 			i = 4;
+#endif
 		else if (force_fast_charge == 2) {
 			switch (fast_charge_level) {
 				case FAST_CHARGE_500:
