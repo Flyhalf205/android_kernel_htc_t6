@@ -1710,6 +1710,95 @@ out:
 	return 0;
 }
 
+static int t6wl_usb_product_id_match_array[] = {
+	0x0ff8, 0x0e5a, 
+	0x0fa4, 0x0ea7, 
+	0x0fa5, 0x0ea8, 
+	0x0f29, 0x07ba, 
+	0x0f2a, 0x07bb, 
+	0x0f91, 0x0ec1, 
+	0x0f64, 0x07bc, 
+	0x0f63, 0x07bd, 
+	-1,
+};
+
+static int t6wl_usb_product_id_rndis[] = {
+	0x0754, 
+	0x075a, 
+	0x0755, 
+	0x075b, 
+	0x0758, 
+	0x075e, 
+	0x0759, 
+	0x075f, 
+	0x07b0, 
+	0x07b4, 
+	0x07b1, 
+	0x07b5, 
+	0x07b2, 
+	0x07b6, 
+	0x07b3, 
+	0x07b7, 
+};
+
+static int t6wl_usb_product_id_match(int product_id, int intrsharing)
+{
+	int *pid_array = t6wl_usb_product_id_match_array;
+	int *rndis_array = t6wl_usb_product_id_rndis;
+	int category = 0;
+
+	if (!pid_array)
+		return product_id;
+
+	
+	if (board_mfg_mode())
+		return product_id;
+
+	while (pid_array[0] >= 0) {
+		if (product_id == pid_array[0])
+			return pid_array[1];
+		pid_array += 2;
+	}
+
+	switch (product_id) {
+		case 0x0fb4: 
+			category = 0;
+			break;
+		case 0x0fb5: 
+			category = 1;
+			break;
+		case 0x0f8e: 
+			category = 2;
+			break;
+		case 0x0f8f: 
+			category = 3;
+			break;
+		case 0x0f5f: 
+			category = 4;
+			break;
+		case 0x0f60: 
+			category = 5;
+			break;
+		case 0x0f38: 
+			category = 6;
+			break;
+		case 0x0f3d: 
+			category = 7;
+			break;
+		default:
+			category = -1;
+			break;
+	}
+
+	if (category != -1) {
+		if (intrsharing)
+			return rndis_array[category * 2];
+		else
+			return rndis_array[category * 2 + 1];
+	}
+	return product_id;
+}
+
 static struct android_usb_platform_data android_usb_pdata = {
 	.vendor_id	= 0x0bb4,
 	.product_id	= 0x0607,
@@ -1726,6 +1815,7 @@ static struct android_usb_platform_data android_usb_pdata = {
 	.usb_diag_interface = "diag,diag_mdm",
 	.fserial_init_string = "HSIC:modem,tty,tty:autobot,tty:serial,tty:autobot,tty:acm",
 	.serial_number = "000000000000",
+	.match = t6wl_usb_product_id_match,
 	.nluns		= 1,
 };
 
