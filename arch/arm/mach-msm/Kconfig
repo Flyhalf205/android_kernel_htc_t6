@@ -148,39 +148,6 @@ config ARCH_MSM8960
 	select MSM_KRAIT_WFE_FIXUP
 	select MSM_IOMMU_GPU_SYNC
 
-config ARCH_MSM8930
-	bool "MSM8930"
-	select ARCH_MSM_KRAITMP
-	select ARM_GIC
-	select CPU_V7
-	select GPIO_MSM_V2
-	select MSM_GPIOMUX
-	select MSM_SCM if SMP
-	select MSM_DIRECT_SCLK_ACCESS
-	select REGULATOR
-	select MSM_RPM_REGULATOR
-	select MSM_RPM
-	select MSM_XO
-	select MSM_QDSP6_APR
-	select MSM_QDSP6_CODECS
-	select MSM_PIL
-	select MSM_AUDIO_QDSP6 if SND_SOC
-	select CPU_HAS_L2_PMU
-	select MSM_SPM_V2
-	select MSM_L2_SPM
-	select MSM_NATIVE_RESTART
-	select DONT_MAP_HOLE_AFTER_MEMBANK0
-	select MSM_REMOTE_SPINLOCK_SFPB
-	select ARCH_SPARSEMEM_ENABLE
-	select ARCH_HAS_HOLES_MEMORYMODEL
-	select MSM_ULTRASOUND
-	select MULTI_IRQ_HANDLER
-	select MSM_PM8X60 if PM
-	select HOLES_IN_ZONE if SPARSEMEM
-	select ARM_HAS_SG_CHAIN
-	select MSM_KRAIT_WFE_FIXUP
-	select MSM_IOMMU_GPU_SYNC
-
 config ARCH_APQ8064
 	bool "APQ8064"
 	select ARCH_MSM_KRAITMP
@@ -379,77 +346,11 @@ config ARCH_MSM8974
 	select MSM_RPM_REGULATOR_SMD
 	select ARM_HAS_SG_CHAIN
 
-config MACH_ELITE
-	depends on ARCH_MSM8960
-	bool "Elite"
-	help
-	  Support for the HTC Elite
-
-config MACH_VILLE
-	depends on ARCH_MSM8960
-	bool "Ville"
-	help
-	  Support for the HTC Ville
-
-config MACH_FIGHTER
-	depends on ARCH_MSM8960
-	bool "Fighter"
-	help
-	  Support for the HTC Fighter
-
-config MACH_JET
-	depends on ARCH_MSM8960
-	bool "Jet"
-	help
-	  Support for the HTC Jet
-
 config MACH_JEWEL_DD
         depends on ARCH_MSM8960
         bool "Jel_dd"
         help
           Support for the HTC Jewel_DD
-
-config MACH_VALENTE_WX
-	depends on ARCH_MSM8960
-	bool "Valente#WX"
-	help
-	  Support for the HTC Valente#WX
-
-config MACH_VALENTE_WX_C9
-	depends on ARCH_MSM8960
-	bool "Valente#WX_C9"
-	help
-	  Support for the HTC Valente#WX_C9
-
-config MACH_K2_CL
-	depends on ARCH_MSM8930
-	bool "K2_CL"
-	help
-	  Support for the HTC K2_#CL
-
-config MACH_K2_PLC_CL
-	depends on ARCH_MSM8930
-	bool "K2_PLC_CL"
-	help
-	  Support for the HTC K2_PLC#CL
-
-config MACH_K2_U
-	depends on ARCH_MSM8930
-	bool "K2_U"
-	help
-	  Support for the HTC K2_U
-
-config MACH_TC2
-	depends on ARCH_MSM8930
-	bool "TC2"
-	help
-	  Support for the HTC TC2
-
-config MACH_K2_UL
-	depends on ARCH_MSM8930
-	bool "K2_UL"
-	help
-	  Support for the HTC K2_UL
 
 config MACH_M4_UL
 	depends on ARCH_MSM8930
@@ -463,29 +364,11 @@ config MACH_M4_U
 	help
 	  Support for the HTC M4
 
-config MACH_ZIP_CL
-	depends on ARCH_MSM8930
-	bool "ZIP_CL"
-	help
-	  Support for the HTC ZIP_CL
-
 config MACH_ZIP_CL_MI2S_DATA_SWITCH
 	depends on MACH_ZIP_CL
 	bool "ZIP_CL_MI2S_DATA_SWITCH"
 	help
 	  Support for the workaround for ZIP_CL MI2S data Input/Output switch
-
-config MACH_EVITA_UTL
-        depends on ARCH_MSM8960
-        bool "Evita#UTL"
-        help
-          Support for the HTC Evita#UTL
-
-config MACH_OPERAUL
-	depends on ARCH_MSM8930
-	bool "OPERAUL"
-	help
-	  Support for the HTC OPERAUL
 
 config ARCH_FSM9XXX
 	bool "FSM9XXX"
@@ -2950,35 +2833,11 @@ config MACH_MONARUDO
 	help
 	  Support for the HTC APQ8064 MONARUDO.
 
-config MACH_DELUXE_J
-        depends on ARCH_APQ8064
-        bool "APQ8064 DELUXE_J"
-        help
-          Support for the HTC APQ8064 DELUXE_J.
-
-config MACH_DELUXE_UB1
-        depends on ARCH_APQ8064
-        bool "APQ8064 DELUXE_UB1"
-        help
-          Support for the HTC APQ8064 DELUXE_UB1.
-
-config MACH_DELUXE_U
-        depends on ARCH_APQ8064
-        bool "APQ8064 DELUXE_U"
-        help
-          Support for the HTC APQ8064 DELUXE_U.
-
 config MACH_DELUXE_UL
         depends on ARCH_APQ8064
         bool "APQ8064 DELUXE_UL"
         help
           Support for the HTC APQ8064 DELUXE_UL.
-
-config MACH_IMPRESSION_J
-        depends on ARCH_APQ8064
-        bool "APQ8064 IMPRESSION_J"
-        help
-          Support for the HTC APQ8064 IMPRESSION_J.
 
 config MACH_M7_UL
         depends on ARCH_APQ8064
@@ -2992,96 +2851,11 @@ config MACH_M7_U
         help
           Support for the HTC APQ8064 M7_U.
 
-config MACH_M7_WLS
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_WLS"
-        help
-          Support for the HTC APQ8064 M7_WLS.
-
-config MACH_M7_WLV
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_WLV"
-        help
-          Support for the HTC APQ8064 M7_WLV.
-
-config MACH_M7_WLJ
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_WLJ"
-        help
-          Support for the HTC APQ8064 M7_WLJ.
-
-
-config MACH_M7_DCG
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_DCG"
-        help
-          Support for the HTC APQ8064 M7_DCG.
-
-config MACH_M7_DUG
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_DUG"
-        help
-          Support for the HTC APQ8064 M7_DUG.
-
-config MACH_M7_DTU
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7_DTU"
-        help
-          Support for the HTC APQ8064 M7_DTU.
-
-config MACH_M7C_DTU
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7C_DTU"
-        help
-          Support for the HTC APQ8064 M7C_DTU.
-
-config MACH_M7C_DUG
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7C_DUG"
-        help
-          Support for the HTC APQ8064 M7C_DUG.
-
-config MACH_M7C_DWG
-        depends on ARCH_APQ8064
-        bool "APQ8064 M7C_DWG"
-        help
-          Support for the HTC APQ8064 M7C_DWG.
-
-config MACH_T6_TL
-        depends on ARCH_APQ8064
-        bool "APQ8064 T6_TL"
-        help
-          Support for the HTC APQ8064 T6_TL.
-
-config MACH_T6_DUG
-        depends on ARCH_APQ8064
-        bool "APQ8064 T6_DUG"
-        help
-          Support for the HTC APQ8064 T6_DUG.
-
-config MACH_T6_DWG
-        depends on ARCH_APQ8064
-        bool "APQ8064 T6_DWG"
-        help
-          Support for the HTC APQ8064 T6_DWG.
-
 config MACH_M7_EVM
         depends on ARCH_APQ8064
         bool "APQ8064 M7_EVM"
         help
           Support for the HTC APQ8064 M7_EVM.
-
-config MACH_DLXP_WL
-	depends on ARCH_APQ8064
-	bool "APQ8064 DLXP_WL"
-	help
-	  Support for the HTC APQ8064 DLXP_WL.
-
-config MACH_DLXP_UL
-	depends on ARCH_APQ8064
-	bool "APQ8064 DLXP_UL"
-	help
-	  Support for the HTC APQ8064 DLXP_UL.
 
 config MACH_DLXP_U
 	depends on ARCH_APQ8064
@@ -3107,11 +2881,11 @@ config MACH_DLP_DTU
 	help
 	  Support for the HTC APQ8064 DLP_DTU.
 
-config MACH_T6_WL
+config MACH_T6_WHL
         depends on ARCH_APQ8064
-        bool "APQ8064 T6_WL"
+        bool "APQ8064 T6_WHL"
         help
-          Support for the HTC APQ8064 T6_WL.
+          Support for the HTC APQ8064 T6_WHL.
 
 config QSC_MODEM
         default n
@@ -3148,6 +2922,12 @@ config MSM_NONSMD_PACKET_FILTER
 	help
 	  The white TCP port list is updated in attribute
 	  repying on RIL to notify modem.
+
+config MONITOR_STREAMING_PORT_SOCKET
+	bool "monitor streaming port"
+	default n
+	help
+	  Monitor if any streaming port is connected
 
 config IO_FOOTPRINT
 	bool "Trace I/O for each CPU"

@@ -2123,7 +2123,7 @@ static inline void hci_ev_radio_text(struct radio_hci_dev *hdev,
 
 	while ((skb->data[len+RDS_OFFSET] != 0x0d) && (len < RX_RT_DATA_LENGTH))
 		len++;
-	data = kmalloc(len+RDS_OFFSET, GFP_ATOMIC);
+	data = kmalloc(len + RDS_OFFSET + 1, GFP_ATOMIC);
 	if (!data) {
 		FMDERR("Failed to allocate memory");
 		return;
@@ -2138,7 +2138,7 @@ static inline void hci_ev_radio_text(struct radio_hci_dev *hdev,
 	memcpy(data+RDS_OFFSET, &skb->data[RDS_OFFSET], len);
 	data[len+RDS_OFFSET] = 0x00;
 
-	iris_q_evt_data(radio, data, len+RDS_OFFSET, IRIS_BUF_RT_RDS);
+	iris_q_evt_data(radio, data, len + RDS_OFFSET + 1, IRIS_BUF_RT_RDS);
 
 	kfree(data);
 }

@@ -19,17 +19,17 @@
 #include <mach/gpiomux.h>
 
 #include "devices.h"
-#if defined(CONFIG_MACH_T6_TL)
+#if defined(CONFIG_MACH_DUMMY)
 #include "board-t6tl.h"
-#elif defined(CONFIG_MACH_T6_DUG)
+#elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6dug.h"
-#elif defined(CONFIG_MACH_T6_DWG)
+#elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6dwg.h"
 #elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6ul.h"
-#elif defined(CONFIG_MACH_T6_WL)
-#include "board-t6wl.h"
 #elif defined(CONFIG_MACH_DUMMY)
+#include "board-t6wl.h"
+#elif defined(CONFIG_MACH_T6_WHL)
 #include "board-t6whl.h"
 #elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6uhl.h"
@@ -237,7 +237,7 @@ static struct gpiomux_setting cam_settings[] = {
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
-#if defined(CONFIG_MACH_T6_TL) || defined(CONFIG_MACH_T6_DWG) || defined(CONFIG_MACH_T6_DUG)
+#if defined(CONFIG_MACH_DUMMY) || defined(CONFIG_MACH_DUMMY) || defined(CONFIG_MACH_DUMMY)
 	{
 		.func = GPIOMUX_FUNC_2, 
 		.drv = GPIOMUX_DRV_16MA,

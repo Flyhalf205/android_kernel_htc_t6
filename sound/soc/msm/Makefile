@@ -82,7 +82,7 @@ endif
 obj-$(CONFIG_SND_SOC_MSM8960) += snd-soc-msm8960.o
 else
 # Move board-specific msm8930.o to mach-msm
-#ifdef CONFIG_ARCH_MSM8930
+#ifdef CONFIG_ARCH_DUMMY
 #snd-soc-msm8960-objs := msm8930.o
 #obj-$(CONFIG_SND_SOC_MSM8960) += snd-soc-msm8960.o
 #else

@@ -27,13 +27,13 @@
 #include <mach/gpiomux.h>
 #include <mach/restart.h>
 #include "devices.h"
-#include "board-t6wl.h"
+#include "board-t6whl.h"
 #include <asm/setup.h>
 #ifdef CONFIG_HTC_BATT_8960
 #include "mach/htc_battery_8960.h"
 #endif
 
-void t6wl_pm8xxx_adc_device_register(void);
+void t6whl_pm8xxx_adc_device_register(void);
 
 struct pm8xxx_gpio_init {
 	unsigned			gpio;
@@ -157,7 +157,7 @@ static struct pm8xxx_mpp_init pm8xxx_mpps[] __initdata = {
 
 int is_9kramdump_mode(void);
 
-void __init t6wl_pm8xxx_gpio_mpp_init(void)
+void __init t6whl_pm8xxx_gpio_mpp_init(void)
 {
 	int i, rc;
 
@@ -219,13 +219,13 @@ if( !is_9kramdump_mode() )
 	}
 }
 
-static struct pm8xxx_pwrkey_platform_data t6wl_pm8921_pwrkey_pdata = {
+static struct pm8xxx_pwrkey_platform_data t6whl_pm8921_pwrkey_pdata = {
 	.pull_up		= 1,
 	.kpd_trigger_delay_us	= 15625,
 	.wakeup			= 1,
 };
 
-static struct pm8xxx_misc_platform_data t6wl_pm8921_misc_pdata = {
+static struct pm8xxx_misc_platform_data t6whl_pm8921_misc_pdata = {
 	.priority		= 0,
 };
 
@@ -318,13 +318,13 @@ static struct pm8xxx_led_configure pm8921_led_info[] = {
         },
 };
 
-static struct pm8xxx_led_platform_data t6wl_pm8921_leds_pdata = {
+static struct pm8xxx_led_platform_data t6whl_pm8921_leds_pdata = {
 	.num_leds = ARRAY_SIZE(pm8921_led_info),
 	.leds = pm8921_led_info,
 };
 
 
-static struct pm8xxx_adc_amux t6wl_pm8921_adc_channels_data[] = {
+static struct pm8xxx_adc_amux t6whl_pm8921_adc_channels_data[] = {
 	{"vcoin", CHANNEL_VCOIN, CHAN_PATH_SCALING2, AMUX_RSV1,
 		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
 	{"vbat", CHANNEL_VBAT, CHAN_PATH_SCALING2, AMUX_RSV1,
@@ -359,140 +359,140 @@ static struct pm8xxx_adc_amux t6wl_pm8921_adc_channels_data[] = {
 		ADC_DECIMATION_TYPE2, ADC_SCALE_DEFAULT},
 };
 
-static struct pm8xxx_adc_properties t6wl_pm8921_adc_data = {
+static struct pm8xxx_adc_properties t6whl_pm8921_adc_data = {
 	.adc_vdd_reference	= 1800, 
 	.bitresolution		= 15,
 	.bipolar                = 0,
 };
-static const struct pm8xxx_adc_map_pt t6wl_adcmap_btm_table[] = {
-	{-200,	1671},
-	{-190,	1663},
+static const struct pm8xxx_adc_map_pt t6whl_adcmap_btm_table[] = {
+	{-200,	1670},
+	{-190,	1662},
 	{-180,	1654},
-	{-170,	1646},
+	{-170,	1645},
 	{-160,	1636},
-	{-150,	1627},
-	{-140,	1617},
+	{-150,	1626},
+	{-140,	1616},
 	{-130,	1606},
 	{-120,	1595},
-	{-110,	1584},
-	{-100,	1572},
-	{-90,	1560},
-	{-80,	1548},
-	{-70,	1534},
-	{-60,	1521},
-	{-50,	1507},
-	{-40,	1492},
-	{-30,	1477},
-	{-20,	1462},
-	{-10,	1446},
-	{-0,	1430},
-	{10, 1413},
-	{20, 1396},
-	{30, 1379},
-	{40, 1361},
-	{50, 1343},
-	{60, 1325},
-	{70, 1306},
-	{80, 1287},
-	{90, 1267},
-	{100,	1248},
-	{110,	1228},
-	{120,	1208},
-	{130,	1188},
-	{140,	1168},
-	{150,	1147},
-	{160,	1127},
-	{170,	1106},
-	{180,	1086},
-	{190,	1065},
-	{200,	1044},
-	{210,	1024},
-	{220,	1004},
-	{230,	983},
-	{240,	963},
-	{250,	943},
-	{260,	923},
-	{270,	903},
-	{280,	884},
-	{290,	864},
-	{300,	845},
-	{310,	827},
-	{320,	808},
-	{330,	790},
-	{340,	772},
-	{350,	755},
-	{360,	738},
-	{370,	721},
-	{380,	704},
-	{390,	688},
-	{400,	672},
-	{410,	657},
-	{420,	642},
-	{430,	627},
-	{440,	613},
-	{450,	599},
-	{460,	585},
-	{470,	572},
-	{480,	559},
-	{490,	547},
-	{500,	535},
-	{510,	523},
-	{520,	511},
-	{530,	500},
-	{540,	489},
-	{550,	479},
-	{560,	469},
-	{570,	459},
-	{580,	449},
-	{590,	440},
-	{600,	431},
-	{610,	423},
-	{620,	414},
-	{630,	406},
-	{640,	398},
-	{650,	390},
-	{660,	383},
-	{670,	376},
-	{680,	369},
-	{690,	363},
-	{700,	356},
-	{710,	350},
-	{720,	344},
-	{730,	338},
-	{740,	333},
-	{750,	327},
-	{760,	322},
-	{770,	317},
-	{780,	312},
-	{790,	308}
+	{-110,	1583},
+	{-100,	1571},
+	{-90,	1559},
+	{-80,	1546},
+	{-70,	1533},
+	{-60,	1519},
+	{-50,	1505},
+	{-40,	1491},
+	{-30,	1476},
+	{-20,	1460},
+	{-10,	1444},
+	{-0,	1428},
+	{10,	1411},
+	{20,	1393},
+	{30,	1376},
+	{40,	1358},
+	{50,	1339},
+	{60,	1321},
+	{70,	1301},
+	{80,	1282},
+	{90,	1262},
+	{100,	1242},
+	{110,	1222},
+	{120,	1202},
+	{130,	1181},
+	{140,	1161},
+	{150,	1140},
+	{160,	1119},
+	{170,	1097},
+	{180,	1077},
+	{190,	1055},
+	{200,	1034},
+	{210,	1013},
+	{220,	992},
+	{230,	971},
+	{240,	950},
+	{250,	930},
+	{260,	909},
+	{270,	889},
+	{280,	869},
+	{290,	849},
+	{300,	829},
+	{310,	810},
+	{320,	790},
+	{330,	772},
+	{340,	753},
+	{350,	735},
+	{360,	717},
+	{370,	700},
+	{380,	683},
+	{390,	666},
+	{400,	649},
+	{410,	633},
+	{420,	618},
+	{430,	602},
+	{440,	587},
+	{450,	573},
+	{460,	559},
+	{470,	545},
+	{480,	531},
+	{490,	518},
+	{500,	506},
+	{510,	493},
+	{520,	481},
+	{530,	470},
+	{540,	458},
+	{550,	447},
+	{560,	437},
+	{570,	426},
+	{580,	416},
+	{590,	406},
+	{600,	397},
+	{610,	388},
+	{620,	379},
+	{630,	371},
+	{640,	362},
+	{650,	354},
+	{660,	347},
+	{670,	339},
+	{680,	332},
+	{690,	325},
+	{700,	318},
+	{710,	312},
+	{720,	306},
+	{730,	299},
+	{740,	294},
+	{750,	288},
+	{760,	282},
+	{770,	277},
+	{780,	272},
+	{790,	267}
 };
 
 static struct pm8xxx_adc_map_table pm8xxx_adcmap_btm_table = {
-	.table = t6wl_adcmap_btm_table,
-	.size = ARRAY_SIZE(t6wl_adcmap_btm_table),
+	.table = t6whl_adcmap_btm_table,
+	.size = ARRAY_SIZE(t6whl_adcmap_btm_table),
 };
 
-static struct pm8xxx_adc_platform_data t6wl_pm8921_adc_pdata = {
-	.adc_channel		= t6wl_pm8921_adc_channels_data,
-	.adc_num_board_channel	= ARRAY_SIZE(t6wl_pm8921_adc_channels_data),
-	.adc_prop		= &t6wl_pm8921_adc_data,
+static struct pm8xxx_adc_platform_data t6whl_pm8921_adc_pdata = {
+	.adc_channel		= t6whl_pm8921_adc_channels_data,
+	.adc_num_board_channel	= ARRAY_SIZE(t6whl_pm8921_adc_channels_data),
+	.adc_prop		= &t6whl_pm8921_adc_data,
 	.adc_mpp_base		= PM8921_MPP_PM_TO_SYS(1),
 	.adc_map_btm_table	= &pm8xxx_adcmap_btm_table,
-	.pm8xxx_adc_device_register	= t6wl_pm8xxx_adc_device_register,
+	.pm8xxx_adc_device_register	= t6whl_pm8xxx_adc_device_register,
 };
 
 static struct pm8xxx_mpp_platform_data
-t6wl_pm8921_mpp_pdata __devinitdata = {
+t6whl_pm8921_mpp_pdata __devinitdata = {
 	.mpp_base	= PM8921_MPP_PM_TO_SYS(1),
 };
 
 static struct pm8xxx_gpio_platform_data
-t6wl_pm8921_gpio_pdata __devinitdata = {
+t6whl_pm8921_gpio_pdata __devinitdata = {
 	.gpio_base	= PM8921_GPIO_PM_TO_SYS(1),
 };
 
 static struct pm8xxx_irq_platform_data
-t6wl_pm8921_irq_pdata __devinitdata = {
+t6whl_pm8921_irq_pdata __devinitdata = {
 	.irq_base		= PM8921_IRQ_BASE,
 	.devirq			= MSM_GPIO_TO_INT(MSM_PM8921_APC_USR_IRQ_N),
 	.irq_trigger_flag	= IRQF_TRIGGER_LOW,
@@ -500,7 +500,7 @@ t6wl_pm8921_irq_pdata __devinitdata = {
 };
 
 static struct pm8xxx_rtc_platform_data
-t6wl_pm8921_rtc_pdata = {
+t6whl_pm8921_rtc_pdata = {
 	.rtc_write_enable       = true,
 #ifdef CONFIG_HTC_OFFMODE_ALARM
 	.rtc_alarm_powerup      = true,
@@ -509,7 +509,7 @@ t6wl_pm8921_rtc_pdata = {
 #endif
 };
 
-static int t6wl_pm8921_therm_mitigation[] = {
+static int t6whl_pm8921_therm_mitigation[] = {
 	1100,
 	700,
 	600,
@@ -551,15 +551,15 @@ pm8921_chg_pdata __devinitdata = {
 	.eoc_ibat_thre_ma   = 50,
 	.ichg_threshold_ua  = -1200000,
 	.ichg_regulation_thr_ua = -430000,
-	.thermal_mitigation	= t6wl_pm8921_therm_mitigation,
-	.thermal_levels		= ARRAY_SIZE(t6wl_pm8921_therm_mitigation),
+	.thermal_mitigation	= t6whl_pm8921_therm_mitigation,
+	.thermal_levels		= ARRAY_SIZE(t6whl_pm8921_therm_mitigation),
 	.cold_thr = PM_SMBC_BATT_TEMP_COLD_THR__HIGH,
 	.hot_thr = PM_SMBC_BATT_TEMP_HOT_THR__LOW,
 	.rconn_mohm		= 10, 
 };
 
 static struct pm8xxx_ccadc_platform_data
-t6wl_pm8xxx_ccadc_pdata = {
+t6whl_pm8xxx_ccadc_pdata = {
 	.r_sense		= 10,
 	.calib_delay_ms		= 600000,
 };
@@ -571,6 +571,7 @@ pm8921_bms_pdata __devinitdata = {
 	.v_failure		= 3000,
 	.max_voltage_uv		= MAX_VOLTAGE_MV * 1000,
 	.rconn_mohm		= 0,
+	.store_batt_data_soc_thre	= 100,
 	.get_power_jacket_status	= get_pj_status,
 	.criteria_sw_est_ocv = 86400000, 
 	.rconn_mohm_sw_est_ocv = 10,
@@ -600,24 +601,24 @@ static struct pm8xxx_vibrator_platform_data pm8xxx_vib_pdata = {
 	};
 
 static struct pm8921_platform_data
-t6wl_pm8921_platform_data __devinitdata = {
+t6whl_pm8921_platform_data __devinitdata = {
 	.regulator_pdatas	= t6_pm8921_regulator_pdata,
-	.irq_pdata		= &t6wl_pm8921_irq_pdata,
-	.gpio_pdata		= &t6wl_pm8921_gpio_pdata,
-	.mpp_pdata		= &t6wl_pm8921_mpp_pdata,
-	.rtc_pdata		= &t6wl_pm8921_rtc_pdata,
-	.pwrkey_pdata	= &t6wl_pm8921_pwrkey_pdata,
-	.misc_pdata		= &t6wl_pm8921_misc_pdata,
-	.leds_pdata		= &t6wl_pm8921_leds_pdata,
-	.adc_pdata		= &t6wl_pm8921_adc_pdata,
+	.irq_pdata		= &t6whl_pm8921_irq_pdata,
+	.gpio_pdata		= &t6whl_pm8921_gpio_pdata,
+	.mpp_pdata		= &t6whl_pm8921_mpp_pdata,
+	.rtc_pdata		= &t6whl_pm8921_rtc_pdata,
+	.pwrkey_pdata	= &t6whl_pm8921_pwrkey_pdata,
+	.misc_pdata		= &t6whl_pm8921_misc_pdata,
+	.leds_pdata		= &t6whl_pm8921_leds_pdata,
+	.adc_pdata		= &t6whl_pm8921_adc_pdata,
 	.charger_pdata		= &pm8921_chg_pdata,
 	.bms_pdata		= &pm8921_bms_pdata,
-	.ccadc_pdata		= &t6wl_pm8xxx_ccadc_pdata,
+	.ccadc_pdata		= &t6whl_pm8xxx_ccadc_pdata,
 	.vibrator_pdata         = &pm8xxx_vib_pdata,
 };
 
 static struct pm8xxx_irq_platform_data
-t6wl_pm8821_irq_pdata __devinitdata = {
+t6whl_pm8821_irq_pdata __devinitdata = {
 	.irq_base		= PM8821_IRQ_BASE,
 	.devirq			= PM8821_SEC_IRQ_N,
 	.irq_trigger_flag	= IRQF_TRIGGER_HIGH,
@@ -625,33 +626,33 @@ t6wl_pm8821_irq_pdata __devinitdata = {
 };
 
 static struct pm8xxx_mpp_platform_data
-t6wl_pm8821_mpp_pdata __devinitdata = {
+t6whl_pm8821_mpp_pdata __devinitdata = {
 	.mpp_base	= PM8821_MPP_PM_TO_SYS(1),
 };
 
 static struct pm8821_platform_data
-t6wl_pm8821_platform_data __devinitdata = {
-	.irq_pdata	= &t6wl_pm8821_irq_pdata,
-	.mpp_pdata	= &t6wl_pm8821_mpp_pdata,
+t6whl_pm8821_platform_data __devinitdata = {
+	.irq_pdata	= &t6whl_pm8821_irq_pdata,
+	.mpp_pdata	= &t6whl_pm8821_mpp_pdata,
 };
 
-static struct msm_ssbi_platform_data t6wl_ssbi_pm8921_pdata __devinitdata = {
+static struct msm_ssbi_platform_data t6whl_ssbi_pm8921_pdata __devinitdata = {
 	.controller_type = MSM_SBI_CTRL_PMIC_ARBITER,
 	.slave	= {
 		.name		= "pm8921-core",
-		.platform_data	= &t6wl_pm8921_platform_data,
+		.platform_data	= &t6whl_pm8921_platform_data,
 	},
 };
 
-static struct msm_ssbi_platform_data t6wl_ssbi_pm8821_pdata __devinitdata = {
+static struct msm_ssbi_platform_data t6whl_ssbi_pm8821_pdata __devinitdata = {
 	.controller_type = MSM_SBI_CTRL_PMIC_ARBITER,
 	.slave	= {
 		.name		= "pm8821-core",
-		.platform_data	= &t6wl_pm8821_platform_data,
+		.platform_data	= &t6whl_pm8821_platform_data,
 	},
 };
 
-void __init t6wl_init_pmic(void)
+void __init t6whl_init_pmic(void)
 {
 	if (system_rev == EVM) {
 		pm8921_chg_pdata.cable_in_irq = 0;
@@ -660,15 +661,15 @@ void __init t6wl_init_pmic(void)
 
 	pmic_reset_irq = PM8921_IRQ_BASE + PM8921_RESOUT_IRQ;
 	apq8064_device_ssbi_pmic1.dev.platform_data =
-						&t6wl_ssbi_pm8921_pdata;
+						&t6whl_ssbi_pm8921_pdata;
 	apq8064_device_ssbi_pmic2.dev.platform_data =
-				&t6wl_ssbi_pm8821_pdata;
-	t6wl_pm8921_platform_data.num_regulators =
+				&t6whl_ssbi_pm8821_pdata;
+	t6whl_pm8921_platform_data.num_regulators =
 					t6_pm8921_regulator_pdata_len;
 
 }
 
-void __init t6wl_init_pmic_register_cam_cb(void *cam_vcm_on_cb, void *cam_vcm_off_cb)
+void __init t6whl_init_pmic_register_cam_cb(void *cam_vcm_on_cb, void *cam_vcm_off_cb)
 {
 	if (cam_vcm_on_cb)
 		pm8xxx_vib_pdata.camera_cb = cam_vcm_on_cb;

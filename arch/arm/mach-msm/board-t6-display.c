@@ -36,9 +36,9 @@
 
 #if defined(CONFIG_MACH_DUMMY)
 #include "board-t6ul.h"
-#elif defined(CONFIG_MACH_T6_WL)
-#include "board-t6wl.h"
 #elif defined(CONFIG_MACH_DUMMY)
+#include "board-t6wl.h"
+#elif defined(CONFIG_MACH_T6_WHL)
 #include "board-t6whl.h"
 #elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6uhl.h"

@@ -84,7 +84,7 @@
 #endif
 
 #include <mach/msm_watchdog.h>
-#include "board-t6wl.h"
+#include "board-t6whl.h"
 #include "spm.h"
 #include <mach/mpm.h>
 #include "rpm_resources.h"
@@ -303,7 +303,7 @@ static struct android_pmem_platform_data android_pmem_pdata = {
 	.memory_type = MEMTYPE_EBI1,
 };
 
-static struct platform_device t6wl_android_pmem_device = {
+static struct platform_device t6whl_android_pmem_device = {
 	.name = "android_pmem",
 	.id = 0,
 	.dev = {.platform_data = &android_pmem_pdata},
@@ -315,13 +315,13 @@ static struct android_pmem_platform_data android_pmem_adsp_pdata = {
 	.cached = 0,
 	.memory_type = MEMTYPE_EBI1,
 };
-static struct platform_device t6wl_android_pmem_adsp_device = {
+static struct platform_device t6whl_android_pmem_adsp_device = {
 	.name = "android_pmem",
 	.id = 2,
 	.dev = { .platform_data = &android_pmem_adsp_pdata },
 };
 
-static struct android_pmem_platform_data t6wl_android_pmem_audio_pdata = {
+static struct android_pmem_platform_data t6whl_android_pmem_audio_pdata = {
 	.name = "pmem_audio",
 	.allocator_type = PMEM_ALLOCATORTYPE_BITMAP,
 	.cached = 0,
@@ -351,7 +351,7 @@ static struct memtype_reserve apq8064_reserve_table[] __initdata = {
 };
 
 #if defined(CONFIG_MSM_RTB)
-static struct msm_rtb_platform_data t6wl_rtb_pdata = {
+static struct msm_rtb_platform_data t6whl_rtb_pdata = {
 		.buffer_start_addr = MSM_RTB_PHYS,
 		.size = MSM_RTB_BUFFER_SIZE,
 };
@@ -361,17 +361,17 @@ static int __init msm_rtb_set_buffer_size(char *p)
        int s;
 
        s = memparse(p, NULL);
-       t6wl_rtb_pdata.size = ALIGN(s, SZ_4K);
+       t6whl_rtb_pdata.size = ALIGN(s, SZ_4K);
        return 0;
 }
 early_param("msm_rtb_size", msm_rtb_set_buffer_size);
 
 
-static struct platform_device t6wl_rtb_device = {
+static struct platform_device t6whl_rtb_device = {
        .name           = "msm_rtb",
        .id             = -1,
        .dev            = {
-               .platform_data = &t6wl_rtb_pdata,
+               .platform_data = &t6whl_rtb_pdata,
        },
 };
 #endif
@@ -422,7 +422,7 @@ static void __init reserve_pmem_memory(void)
 #endif 
 }
 
-static int t6wl_paddr_to_memtype(unsigned int paddr)
+static int t6whl_paddr_to_memtype(unsigned int paddr)
 {
 	return MEMTYPE_EBI1;
 }
@@ -431,7 +431,7 @@ static int t6wl_paddr_to_memtype(unsigned int paddr)
 
 #ifdef CONFIG_ION_MSM
 #ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
-static struct ion_cp_heap_pdata cp_mm_t6wl_ion_pdata = {
+static struct ion_cp_heap_pdata cp_mm_t6whl_ion_pdata = {
 	.permission_type = IPT_TYPE_MM_CARVEOUT,
 	.align = PAGE_SIZE,
 	.reusable = FMEM_ENABLED,
@@ -439,7 +439,7 @@ static struct ion_cp_heap_pdata cp_mm_t6wl_ion_pdata = {
 	.fixed_position = FIXED_MIDDLE,
 };
 
-static struct ion_cp_heap_pdata cp_mfc_t6wl_ion_pdata = {
+static struct ion_cp_heap_pdata cp_mfc_t6whl_ion_pdata = {
 	.permission_type = IPT_TYPE_MFC_SHAREDMEM,
 	.align = PAGE_SIZE,
 	.reusable = 0,
@@ -447,13 +447,13 @@ static struct ion_cp_heap_pdata cp_mfc_t6wl_ion_pdata = {
 	.fixed_position = FIXED_HIGH,
 };
 
-static struct ion_co_heap_pdata co_t6wl_ion_pdata = {
+static struct ion_co_heap_pdata co_t6whl_ion_pdata = {
 	.adjacent_mem_id = INVALID_HEAP_ID,
 	.align = PAGE_SIZE,
 	.mem_is_fmem = 0,
 };
 
-static struct ion_co_heap_pdata fw_co_t6wl_ion_pdata = {
+static struct ion_co_heap_pdata fw_co_t6whl_ion_pdata = {
 	.adjacent_mem_id = ION_CP_MM_HEAP_ID,
 	.align = SZ_128K,
 	.mem_is_fmem = FMEM_ENABLED,
@@ -476,7 +476,7 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_MM_HEAP_NAME,
 			.size	= MSM_ION_MM_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &cp_mm_t6wl_ion_pdata,
+			.extra_data = (void *) &cp_mm_t6whl_ion_pdata,
 		},
 		{
 			.id	= ION_MM_FIRMWARE_HEAP_ID,
@@ -484,7 +484,7 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_MM_FIRMWARE_HEAP_NAME,
 			.size	= MSM_ION_MM_FW_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &fw_co_t6wl_ion_pdata,
+			.extra_data = (void *) &fw_co_t6whl_ion_pdata,
 		},
 		{
 			.id	= ION_CP_MFC_HEAP_ID,
@@ -492,7 +492,7 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_MFC_HEAP_NAME,
 			.size	= MSM_ION_MFC_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &cp_mfc_t6wl_ion_pdata,
+			.extra_data = (void *) &cp_mfc_t6whl_ion_pdata,
 		},
 		{
 			.id	= ION_SF_HEAP_ID,
@@ -500,7 +500,7 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_SF_HEAP_NAME,
 			.size	= MSM_ION_SF_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &co_t6wl_ion_pdata,
+			.extra_data = (void *) &co_t6whl_ion_pdata,
 		},
 		{
 			.id	= ION_IOMMU_HEAP_ID,
@@ -513,7 +513,7 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_QSECOM_HEAP_NAME,
 			.size	= MSM_ION_QSECOM_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &co_t6wl_ion_pdata,
+			.extra_data = (void *) &co_t6whl_ion_pdata,
 		},
 		{
 			.id	= ION_AUDIO_HEAP_ID,
@@ -521,13 +521,13 @@ static struct ion_platform_data ion_pdata = {
 			.name	= ION_AUDIO_HEAP_NAME,
 			.size	= MSM_ION_AUDIO_SIZE,
 			.memory_type = ION_EBI_TYPE,
-			.extra_data = (void *) &co_t6wl_ion_pdata,
+			.extra_data = (void *) &co_t6whl_ion_pdata,
 		},
 #endif
 	}
 };
 
-static struct platform_device t6wl_ion_dev = {
+static struct platform_device t6whl_ion_dev = {
 	.name = "ion-msm",
 	.id = 1,
 	.dev = { .platform_data = &ion_pdata },
@@ -778,7 +778,7 @@ static void __init reserve_mdp_memory(void)
 	t6_mdp_writeback(apq8064_reserve_table);
 }
 
-static void __init t6wl_calculate_reserve_sizes(void)
+static void __init t6whl_calculate_reserve_sizes(void)
 {
 	size_pmem_devices();
 	reserve_pmem_memory();
@@ -786,14 +786,14 @@ static void __init t6wl_calculate_reserve_sizes(void)
 	reserve_mdp_memory();
 }
 
-static struct reserve_info t6wl_reserve_info __initdata = {
+static struct reserve_info t6whl_reserve_info __initdata = {
 	.memtype_reserve_table = apq8064_reserve_table,
-	.calculate_reserve_sizes = t6wl_calculate_reserve_sizes,
+	.calculate_reserve_sizes = t6whl_calculate_reserve_sizes,
 	.reserve_fixed_area = apq8064_reserve_fixed_area,
-	.paddr_to_memtype = t6wl_paddr_to_memtype,
+	.paddr_to_memtype = t6whl_paddr_to_memtype,
 };
 
-static int t6wl_memory_bank_size(void)
+static int t6whl_memory_bank_size(void)
 {
 	return 1<<29;
 }
@@ -804,7 +804,7 @@ static void __init locate_unstable_memory(void)
 	unsigned long bank_size;
 	unsigned long low, high;
 
-	bank_size = t6wl_memory_bank_size();
+	bank_size = t6whl_memory_bank_size();
 	low = meminfo.bank[0].start;
 	high = mb->start + mb->size;
 
@@ -818,26 +818,26 @@ static void __init locate_unstable_memory(void)
 		goto no_dmm;
 
 #ifdef CONFIG_ENABLE_DMM
-	t6wl_reserve_info.low_unstable_address = mb->start -
+	t6whl_reserve_info.low_unstable_address = mb->start -
 					MIN_MEMORY_BLOCK_SIZE + mb->size;
-	t6wl_reserve_info.max_unstable_size = MIN_MEMORY_BLOCK_SIZE;
+	t6whl_reserve_info.max_unstable_size = MIN_MEMORY_BLOCK_SIZE;
 
-	t6wl_reserve_info.bank_size = bank_size;
+	t6whl_reserve_info.bank_size = bank_size;
 	pr_info("low unstable address %lx max size %lx bank size %lx\n",
-		t6wl_reserve_info.low_unstable_address,
-		t6wl_reserve_info.max_unstable_size,
-		t6wl_reserve_info.bank_size);
+		t6whl_reserve_info.low_unstable_address,
+		t6whl_reserve_info.max_unstable_size,
+		t6whl_reserve_info.bank_size);
 	return;
 #endif
 no_dmm:
-	t6wl_reserve_info.low_unstable_address = high;
-	t6wl_reserve_info.max_unstable_size = 0;
+	t6whl_reserve_info.low_unstable_address = high;
+	t6whl_reserve_info.max_unstable_size = 0;
 }
 
 int __init parse_tag_memsize(const struct tag *tags);
 static unsigned int mem_size_mb;
 
-static void __init t6wl_reserve(void)
+static void __init t6whl_reserve(void)
 {
 	if (mem_size_mb == 64)
 		return;
@@ -868,9 +868,9 @@ static void __init place_movable_zone(void)
 #endif
 }
 
-static void __init t6wl_early_reserve(void)
+static void __init t6whl_early_reserve(void)
 {
-	reserve_info = &t6wl_reserve_info;
+	reserve_info = &t6whl_reserve_info;
 	locate_unstable_memory();
 	place_movable_zone();
 }
@@ -890,7 +890,7 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.critical_alarm_vol_cols = sizeof(critical_alarm_voltage_mv) / sizeof(int),
 	.overload_vol_thr_mv = 4000,
 	.overload_curr_thr_ma = 0,
-	.smooth_chg_full_delay_min = 1,
+	.smooth_chg_full_delay_min = 3,
 	.shutdown_voltage_critiria_setting = 3400,
 	
 	.icharger.name = "pm8921",
@@ -928,6 +928,9 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.igauge.get_battery_id = pm8921_get_batt_id,
 	.igauge.get_battery_soc = pm8921_bms_get_batt_soc,
 	.igauge.get_battery_cc = pm8921_bms_get_batt_cc,
+	.igauge.store_battery_data = pm8921_bms_store_battery_data_emmc,
+	.igauge.store_battery_ui_soc = pm8921_bms_store_battery_ui_soc,
+	.igauge.get_battery_ui_soc = pm8921_bms_get_battery_ui_soc,
 	.igauge.calculate_pj_level = pm8921_calculate_pj_level,
 	.igauge.is_battery_temp_fault = pm8921_is_batt_temperature_fault,
 	.igauge.is_battery_full = pm8921_is_batt_full,
@@ -1124,7 +1127,7 @@ static struct sf_lut rbatt_sf_id_2 = {
 	
         .row_entries            = {-20,-10, 0, 10, 20, 30, 40},
         .percent        = {100, 95, 90, 85, 80, 75, 70, 65, 60, 55, 50, 45, 40, 35, 30, 25, 20, 15, 10},
-        .sf                     = {
+        .sf                     = {       
                                         {233,171,146,129,95,71,71},
                                         {233,171,146,129,95,71,71},
                                         {233,171,146,129,95,71,71},
@@ -1306,7 +1309,7 @@ static void config_gpio_table(uint32_t *table, int len)
 	}
 }
 
-static void t6wl_usb_dpdn_switch(int path)
+static void t6whl_usb_dpdn_switch(int path)
 {
 	switch (path) {
 	case PATH_USB:
@@ -1565,7 +1568,7 @@ static T_MHL_PLATFORM_DATA mhl_sii9234_device_data = {
 	.gpio_intr = MSM_MHL_INT,
 	.ci2ca = 0,
 #ifdef CONFIG_FB_MSM_HDMI_MHL
-	.mhl_usb_switch		= t6wl_usb_dpdn_switch,
+	.mhl_usb_switch		= t6whl_usb_dpdn_switch,
 	.mhl_1v2_power = mhl_sii9234_1v2_power,
 	.mhl_lpm_power = mhl_sii9234_lpm_power,
 	.enable_5v = hdmi_enable_5v,
@@ -1695,98 +1698,9 @@ out:
 	return 0;
 }
 
-static int t6wl_usb_product_id_match_array[] = {
-	0x0ff8, 0x0e5a, 
-	0x0fa4, 0x0ea7, 
-	0x0fa5, 0x0ea8, 
-	0x0f29, 0x07ba, 
-	0x0f2a, 0x07bb, 
-	0x0f91, 0x0ec1, 
-	0x0f64, 0x07bc, 
-	0x0f63, 0x07bd, 
-	-1,
-};
-
-static int t6wl_usb_product_id_rndis[] = {
-	0x0754, 
-	0x075a, 
-	0x0755, 
-	0x075b, 
-	0x0758, 
-	0x075e, 
-	0x0759, 
-	0x075f, 
-	0x07b0, 
-	0x07b4, 
-	0x07b1, 
-	0x07b5, 
-	0x07b2, 
-	0x07b6, 
-	0x07b3, 
-	0x07b7, 
-};
-
-static int t6wl_usb_product_id_match(int product_id, int intrsharing)
-{
-	int *pid_array = t6wl_usb_product_id_match_array;
-	int *rndis_array = t6wl_usb_product_id_rndis;
-	int category = 0;
-
-	if (!pid_array)
-		return product_id;
-
-	
-	if (board_mfg_mode())
-		return product_id;
-
-	while (pid_array[0] >= 0) {
-		if (product_id == pid_array[0])
-			return pid_array[1];
-		pid_array += 2;
-	}
-
-	switch (product_id) {
-		case 0x0fb4: 
-			category = 0;
-			break;
-		case 0x0fb5: 
-			category = 1;
-			break;
-		case 0x0f8e: 
-			category = 2;
-			break;
-		case 0x0f8f: 
-			category = 3;
-			break;
-		case 0x0f5f: 
-			category = 4;
-			break;
-		case 0x0f60: 
-			category = 5;
-			break;
-		case 0x0f38: 
-			category = 6;
-			break;
-		case 0x0f3d: 
-			category = 7;
-			break;
-		default:
-			category = -1;
-			break;
-	}
-
-	if (category != -1) {
-		if (intrsharing)
-			return rndis_array[category * 2];
-		else
-			return rndis_array[category * 2 + 1];
-	}
-	return product_id;
-}
-
 static struct android_usb_platform_data android_usb_pdata = {
 	.vendor_id	= 0x0bb4,
-	.product_id	= 0x0601,
+	.product_id	= 0x0607,
 	.version	= 0x0100,
 	.product_name		= "Android Phone",
 	.manufacturer_name	= "HTC",
@@ -1800,9 +1714,7 @@ static struct android_usb_platform_data android_usb_pdata = {
 	.usb_diag_interface = "diag,diag_mdm",
 	.fserial_init_string = "HSIC:modem,tty,tty:autobot,tty:serial,tty:autobot,tty:acm",
 	.serial_number = "000000000000",
-	.match = t6wl_usb_product_id_match,
 	.nluns		= 1,
-	.vzw_unmount_cdrom = 1,
 };
 
 static struct platform_device android_usb_device = {
@@ -1893,7 +1805,7 @@ static struct msm_otg_platform_data msm_otg_pdata = {
 	.ldo_power_collapse     = POWER_COLLAPSE_LDO1V8,
 };
 
-static int64_t t6wl_get_usbid_adc(void)
+static int64_t t6whl_get_usbid_adc(void)
 {
        struct pm8xxx_adc_chan_result result;
        int err = 0, adc =0;
@@ -1918,7 +1830,7 @@ struct pm8xxx_gpio_init usb_id_pmic_gpio[] = {
 			 PM_GPIO_FUNC_NORMAL, 0, 0),
 };
 
-static void t6wl_config_usb_id_gpios(bool output)
+static void t6whl_config_usb_id_gpios(bool output)
 {
 	int rc;
 	rc = pm8xxx_gpio_config(usb_id_pmic_gpio[0].gpio, &usb_id_pmic_gpio[0].config);
@@ -1937,11 +1849,11 @@ static void t6wl_config_usb_id_gpios(bool output)
 static struct cable_detect_platform_data cable_detect_pdata = {
        .detect_type            = CABLE_TYPE_PMIC_ADC,
        .usb_id_pin_gpio        = PM_USB1_HS_ID_GPIO,
-       .get_adc_cb             = t6wl_get_usbid_adc,
-       .config_usb_id_gpios    = t6wl_config_usb_id_gpios,
+       .get_adc_cb             = t6whl_get_usbid_adc,
+       .config_usb_id_gpios    = t6whl_config_usb_id_gpios,
 #ifdef CONFIG_FB_MSM_HDMI_MHL
        .mhl_1v2_power = mhl_sii9234_1v2_power,
-       .usb_dpdn_switch        = t6wl_usb_dpdn_switch,
+       .usb_dpdn_switch        = t6whl_usb_dpdn_switch,
 #endif
 };
 
@@ -1953,7 +1865,7 @@ static struct platform_device cable_detect_device = {
        },
 };
 
-void t6wl_cable_detect_register(void)
+void t6whl_cable_detect_register(void)
 {
 	int rc;
 
@@ -1968,14 +1880,14 @@ void t6wl_cable_detect_register(void)
 	platform_device_register(&cable_detect_device);
 }
 
-void t6wl_pm8xxx_adc_device_register(void)
+void t6whl_pm8xxx_adc_device_register(void)
 {
 	pr_info("%s: Register PM8XXX ADC device. rev: %d\n",
 		__func__, system_rev);
-	t6wl_cable_detect_register();
+	t6whl_cable_detect_register();
 }
 
-void t6wl_add_usb_devices(void)
+void t6whl_add_usb_devices(void)
 {
 	printk(KERN_INFO "%s rev: %d\n", __func__, system_rev);
 
@@ -1991,8 +1903,8 @@ void t6wl_add_usb_devices(void)
 
 	
 	if (board_mfg_mode() == 0) {
-		android_usb_pdata.nluns = 1;
-		android_usb_pdata.cdrom_lun = 0x1;
+		android_usb_pdata.nluns = 2;
+		android_usb_pdata.cdrom_lun = 0x2;
 	}
 	android_usb_pdata.serial_number = board_serialno();
 
@@ -2180,7 +2092,7 @@ static void headset_device_register(void)
 
 #define TABLA_INTERRUPT_BASE (NR_MSM_IRQS + NR_GPIO_IRQS + NR_PM8921_IRQS)
 
-static struct wcd9xxx_pdata t6wl_tabla_platform_data = {
+static struct wcd9xxx_pdata t6whl_tabla_platform_data = {
 	.slimbus_slave_device = {
 		.name = "tabla-slave",
 		.e_addr = {0, 0, 0x10, 0, 0x17, 2},
@@ -2239,15 +2151,15 @@ static struct wcd9xxx_pdata t6wl_tabla_platform_data = {
 	},
 };
 
-static struct slim_device t6wl_slim_tabla = {
+static struct slim_device t6whl_slim_tabla = {
 	.name = "tabla-slim",
 	.e_addr = {0, 1, 0x10, 0, 0x17, 2},
 	.dev = {
-		.platform_data = &t6wl_tabla_platform_data,
+		.platform_data = &t6whl_tabla_platform_data,
 	},
 };
 
-static struct wcd9xxx_pdata t6wl_tabla20_platform_data = {
+static struct wcd9xxx_pdata t6whl_tabla20_platform_data = {
 	.slimbus_slave_device = {
 		.name = "tabla-slave",
 		.e_addr = {0, 0, 0x60, 0, 0x17, 2},
@@ -2310,11 +2222,11 @@ static struct wcd9xxx_pdata t6wl_tabla20_platform_data = {
 	},
 };
 
-static struct slim_device t6wl_slim_tabla20 = {
+static struct slim_device t6whl_slim_tabla20 = {
 	.name = "tabla2x-slim",
 	.e_addr = {0, 1, 0x60, 0, 0x17, 2},
 	.dev = {
-		.platform_data = &t6wl_tabla20_platform_data,
+		.platform_data = &t6whl_tabla20_platform_data,
 	},
 };
 
@@ -2449,6 +2361,7 @@ struct max1187x_pdata max1187x_platdata = {
 	.num_cols = 20,
 	.input_protocol = MAX1187X_PROTOCOL_B,
 	.update_feature = MAX1187X_UPDATE_CONFIG,
+	.support_htc_event = 1,
 	.tw_mask = 0xF,
 	.button_code0 = KEY_HOME,
 	.button_code1 = KEY_BACK,
@@ -3055,8 +2968,6 @@ static struct i2c_board_info i2c_CM36282_devices[] = {
 	},
 };
 
-
-
 #if 0 
 static uint32_t gsbi2_gpio_table[] = {
        GPIO_CFG(I2C2_DATA_SENS, 1, GPIO_CFG_OUTPUT, GPIO_CFG_NO_PULL, GPIO_CFG_8MA),
@@ -3382,7 +3293,7 @@ __setup("androidboot.dq=", check_dq_setup);
 
 
 #define MSM_SHARED_RAM_PHYS 0x80000000
-static void __init t6wl_map_io(void)
+static void __init t6whl_map_io(void)
 {
 	msm_shared_ram_phys = MSM_SHARED_RAM_PHYS;
 	msm_map_apq8064_io();
@@ -3390,7 +3301,7 @@ static void __init t6wl_map_io(void)
 		pr_err("socinfo_init() failed!\n");
 }
 
-static void __init t6wl_init_irq(void)
+static void __init t6whl_init_irq(void)
 {
 	struct msm_mpm_device_data *data = NULL;
 
@@ -3873,7 +3784,7 @@ static struct msm_pm_sleep_status_data msm_pm_slp_sts_data = {
 	.mask = 1UL << 13,
 };
 
-static void __init t6wl_init_buses(void)
+static void __init t6whl_init_buses(void)
 {
 	msm_bus_rpm_set_mt_mask();
 	msm_bus_8064_apps_fabric_pdata.rpm_enabled = 1;
@@ -3967,7 +3878,7 @@ static struct resource hdmi_msm_resources[] = {
 static int hdmi_enable_5v(int on);
 static int hdmi_core_power(int on, int show);
 
-static mhl_driving_params t6wl_driving_params[] = {
+static mhl_driving_params t6whl_driving_params[] = {
 	{.format = HDMI_VFRMT_640x480p60_4_3,	.reg_a3=0xFE, .reg_a6=0x0C},
 	{.format = HDMI_VFRMT_720x480p60_16_9,	.reg_a3=0xFE, .reg_a6=0x0C},
 	{.format = HDMI_VFRMT_1280x720p60_16_9,	.reg_a3=0xF3, .reg_a6=0x0C},
@@ -3981,8 +3892,8 @@ static struct msm_hdmi_platform_data hdmi_msm_data = {
 	.enable_5v = hdmi_enable_5v,
 	.core_power = hdmi_core_power,
 	
-	.driving_params = t6wl_driving_params,
-	.dirving_params_count = ARRAY_SIZE(t6wl_driving_params),
+	.driving_params = t6whl_driving_params,
+	.dirving_params_count = ARRAY_SIZE(t6whl_driving_params),
 };
 
 static struct platform_device hdmi_msm_device = {
@@ -4152,13 +4063,13 @@ static struct platform_device *common_devices[] __initdata = {
 	&apq8064_fmem_device,
 #ifdef CONFIG_ANDROID_PMEM
 #ifndef CONFIG_MSM_MULTIMEDIA_USE_ION
-	&t6wl_android_pmem_device,
-	&t6wl_android_pmem_adsp_device,
-	&t6wl_android_pmem_audio_device,
+	&t6whl_android_pmem_device,
+	&t6whl_android_pmem_adsp_device,
+	&t6whl_android_pmem_audio_device,
 #endif 
 #endif 
 #ifdef CONFIG_ION_MSM
-	&t6wl_ion_dev,
+	&t6whl_ion_dev,
 #endif
 #ifdef CONFIG_QSEECOM
 	&qseecom_device,
@@ -4234,7 +4145,7 @@ static struct platform_device *common_devices[] __initdata = {
 	&msm_pil_vidc,
 	&msm_gss,
 #ifdef CONFIG_MSM_RTB
-	&t6wl_rtb_device,
+	&t6whl_rtb_device,
 #endif
 
 #ifdef CONFIG_MSM_GEMINI
@@ -4276,7 +4187,7 @@ static struct msm_spi_platform_data t6wl_qup_spi_gsbi1_pdata = {
 	.max_clock_speed = 48000000,
 };
 
-static struct msm_spi_platform_data t6wl_qup_spi_gsbi5_pdata = {
+static struct msm_spi_platform_data t6whl_qup_spi_gsbi5_pdata = {
 	.max_clock_speed = 1100000,
 };
 
@@ -4598,7 +4509,7 @@ struct fingerprint_pdata_struct {
 static struct  fingerprint_pdata_struct fingerprint_pdata = {
        .set_sleep_pin            = fingerprint_set_pin,
        .set_power_control        = fingerprint_set_power_control,
-       .read_engineerid        = fingerprint_read_engineerid,
+       .read_engineerid          = fingerprint_read_engineerid,
 };
 
 static struct spi_board_info validity_fingerprint[] __initdata = {
@@ -4612,7 +4523,7 @@ static struct spi_board_info validity_fingerprint[] __initdata = {
     },
 };
 
-static int __init t6wl_validity_fingerprint_spi_init(void)
+static int __init t6whl_validity_fingerprint_spi_init(void)
 {
     int err;
     int i;
@@ -4640,14 +4551,14 @@ static int __init t6wl_validity_fingerprint_spi_init(void)
 }
 #endif
 
-static struct slim_boardinfo t6wl_slim_devices[] = {
+static struct slim_boardinfo t6whl_slim_devices[] = {
 	{
 		.bus_num = 1,
-		.slim_slave = &t6wl_slim_tabla,
+		.slim_slave = &t6whl_slim_tabla,
 	},
 	{
 		.bus_num = 1,
-		.slim_slave = &t6wl_slim_tabla20,
+		.slim_slave = &t6whl_slim_tabla20,
 	},
 	
 };
@@ -4659,7 +4570,7 @@ static struct msm_i2c_platform_data apq8064_i2c_qup_gsbi2_pdata = {
 };
 
 
-static struct msm_i2c_platform_data t6wl_i2c_qup_gsbi3_pdata = {
+static struct msm_i2c_platform_data t6whl_i2c_qup_gsbi3_pdata = {
 	.clk_freq = 384000,
 	.src_clk_rate = 24000000,
 	
@@ -4668,22 +4579,23 @@ static struct msm_i2c_platform_data t6wl_i2c_qup_gsbi3_pdata = {
 #endif
 };
 
-static struct msm_i2c_platform_data t6wl_i2c_qup_gsbi4_pdata = {
+static struct msm_i2c_platform_data t6whl_i2c_qup_gsbi4_pdata = {
 	.clk_freq = 400000,
 	.src_clk_rate = 24000000,
 	.share_uart_flag = 1,
 };
 
-static struct msm_i2c_platform_data t6wl_i2c_qup_gsbi7_pdata = {
+static struct msm_i2c_platform_data t6whl_i2c_qup_gsbi7_pdata = {
 	.clk_freq = 400000,
 	.src_clk_rate = 24000000,
 	.share_uart_flag = 1,
 };
+
 
 #define GSBI_DUAL_MODE_CODE 0x60
 #define MSM_GSBI1_PHYS		0x12440000
 #define MSM_GSBI7_PHYS		0x16600000
-static void __init t6wl_i2c_init(void)
+static void __init t6whl_i2c_init(void)
 {
 	void __iomem *gsbi_mem;
 
@@ -4696,11 +4608,11 @@ static void __init t6wl_i2c_init(void)
 	apq8064_device_qup_i2c_gsbi2.dev.platform_data =
 					&apq8064_i2c_qup_gsbi2_pdata;
 	apq8064_device_qup_i2c_gsbi3.dev.platform_data =
-					&t6wl_i2c_qup_gsbi3_pdata;
+					&t6whl_i2c_qup_gsbi3_pdata;
 	apq8064_device_qup_i2c_gsbi4.dev.platform_data =
-					&t6wl_i2c_qup_gsbi4_pdata;
+					&t6whl_i2c_qup_gsbi4_pdata;
 	apq8064_device_qup_i2c_gsbi7.dev.platform_data =
-					&t6wl_i2c_qup_gsbi7_pdata;
+					&t6whl_i2c_qup_gsbi7_pdata;
 }
 
 #if defined(CONFIG_KS8851) || defined(CONFIG_KS8851_MODULE)
@@ -4729,7 +4641,7 @@ static int ethernet_init(void)
 #endif
 
 #define DSPS_PIL_GENERIC_NAME          "dsps"
-static void __init t6wl_init_dsps(void)
+static void __init t6whl_init_dsps(void)
 {
        struct msm_dsps_platform_data *pdata =
                msm_dsps_device_8064.dev.platform_data;
@@ -4753,7 +4665,7 @@ struct i2c_registry {
 	int                    len;
 };
 
-static int t6wl_mpu3050_sensor_power_LPM(int on)
+static int t6whl_mpu3050_sensor_power_LPM(int on)
 {
 	int rc = 0;
 
@@ -4890,7 +4802,7 @@ static struct mpu3050_platform_data mpu3050_data = {
 				  0, 1,  0,
 				  0, 0, -1},
 	},
-	.power_LPM = t6wl_mpu3050_sensor_power_LPM,
+	.power_LPM = t6whl_mpu3050_sensor_power_LPM,
 };
 
 static struct i2c_board_info __initdata mpu3050_GSBI12_boardinfo[] = {
@@ -4918,7 +4830,7 @@ static struct i2c_board_info pn544_i2c_boardinfo[] = {
 };
 #endif
 
-static struct i2c_registry t6wl_i2c_devices[] __initdata = {
+static struct i2c_registry t6whl_i2c_devices[] __initdata = {
 	{
 		I2C_SURF | I2C_FFA,
 		APQ_8064_GSBI3_QUP_I2C_BUS_ID,
@@ -5011,11 +4923,11 @@ static void __init register_i2c_devices(void)
 #endif
 #endif
 	
-	for (i = 0; i < ARRAY_SIZE(t6wl_i2c_devices); ++i) {
-		if (t6wl_i2c_devices[i].machs & mach_mask) {
-			i2c_register_board_info(t6wl_i2c_devices[i].bus,
-						t6wl_i2c_devices[i].info,
-						t6wl_i2c_devices[i].len);
+	for (i = 0; i < ARRAY_SIZE(t6whl_i2c_devices); ++i) {
+		if (t6whl_i2c_devices[i].machs & mach_mask) {
+			i2c_register_board_info(t6whl_i2c_devices[i].bus,
+						t6whl_i2c_devices[i].info,
+						t6whl_i2c_devices[i].len);
 		}
 	}
 
@@ -5051,7 +4963,7 @@ static struct pm8xxx_gpio_init receiver_pmic_gpio[] = {
 			 PM_GPIO_FUNC_NORMAL, 0, 0),
 };
 
-static void __init t6wl_receiver_init(void)
+static void __init t6whl_receiver_init(void)
 {
 	pm8xxx_gpio_config(receiver_pmic_gpio[0].gpio,
 			&receiver_pmic_gpio[0].config);
@@ -5177,12 +5089,12 @@ static int cir_reset(void)
 	return 0;
 }
 
-static struct cir_platform_data t6wl_cir_gsbi3_pdata = {
+static struct cir_platform_data t6whl_cir_gsbi3_pdata = {
 	
 	.cir_reset = cir_reset,
 	.cir_power = cir_power,
 };
-static void __init t6wl_cir_init(void)
+static void __init t6whl_cir_init(void)
 {
 	
 	gpio_request(PM8921_GPIO_PM_TO_SYS(PM_CIR_LS_EN), "cir_ls_en");
@@ -5194,7 +5106,7 @@ static void __init t6wl_cir_init(void)
 	pm8xxx_gpio_config(cir_3v_en_gpio.gpio, &cir_3v_en_gpio.config);
 	pm8xxx_gpio_config(cir_rst_gpio_disable.gpio, &cir_rst_gpio_disable.config);
 	apq8064_device_uart_gsbi3.dev.platform_data =
-					&t6wl_cir_gsbi3_pdata;
+					&t6whl_cir_gsbi3_pdata;
 }
 #endif
 
@@ -5202,7 +5114,7 @@ static void __init t6wl_cir_init(void)
 extern void (*cam_vcm_on_cb)(void);
 extern void (*cam_vcm_off_cb)(void);
 #endif
-static void __init t6wl_common_init(void)
+static void __init t6whl_common_init(void)
 {
 	int rc = 0;
 	struct kobject *properties_kobj;
@@ -5234,11 +5146,11 @@ static void __init t6wl_common_init(void)
 	gpio_set_value(AC_WDT_RST, 1);
 #endif
 
-	t6wl_i2c_init();
+	t6whl_i2c_init();
 
 #if 0
 	
-	t6wl_init_pmic_register_cam_cb(&cam_vcm_on_cb, &cam_vcm_off_cb);
+	t6whl_init_pmic_register_cam_cb(&cam_vcm_on_cb, &cam_vcm_off_cb);
 	
 #endif
 
@@ -5246,8 +5158,8 @@ static void __init t6wl_common_init(void)
 	apq8064_device_qup_spi_gsbi1.dev.platform_data =
 						&t6wl_qup_spi_gsbi1_pdata;
 	apq8064_device_qup_spi_gsbi5.dev.platform_data =
-						&t6wl_qup_spi_gsbi5_pdata;
-	t6wl_init_pmic();
+						&t6whl_qup_spi_gsbi5_pdata;
+	t6whl_init_pmic();
 
 	android_usb_pdata.swfi_latency =
 			msm_rpmrs_levels[0].latency_us;
@@ -5255,7 +5167,7 @@ static void __init t6wl_common_init(void)
 	if (system_rev >= 0x80)
 		msm_otg_pdata.phy_init_seq = phy_init_seq_pvt;
 	apq8064_device_otg.dev.platform_data = &msm_otg_pdata;
-	t6wl_init_buses();
+	t6whl_init_buses();
 #ifdef CONFIG_BT
 	bt_export_bd_address();
 #endif
@@ -5264,7 +5176,7 @@ static void __init t6wl_common_init(void)
 #endif 
 	platform_add_devices(common_devices, ARRAY_SIZE(common_devices));
 #ifdef CONFIG_SERIAL_CIR
-	t6wl_cir_init();
+	t6whl_cir_init();
 #endif
 	if(board_mfg_mode() == 9) {
 		if (board_fullramdump_flag())
@@ -5275,7 +5187,7 @@ static void __init t6wl_common_init(void)
 	apq8064_device_hsic_host.dev.platform_data = &msm_hsic_pdata;
 	msm_hsic_pdata.swfi_latency = msm_rpmrs_levels[0].latency_us;
 	device_initialize(&apq8064_device_hsic_host.dev);
-	t6wl_pm8xxx_gpio_mpp_init();
+	t6whl_pm8xxx_gpio_mpp_init();
 	t6_init_mmc();
 
 	pr_info("%s: Add MDM2 device\n", __func__);
@@ -5284,9 +5196,9 @@ static void __init t6wl_common_init(void)
 	platform_device_register(&mdm_8064_device);
 
 	platform_device_register(&apq8064_slim_ctrl);
-	slim_register_board_info(t6wl_slim_devices,
-		ARRAY_SIZE(t6wl_slim_devices));
-	t6wl_init_dsps();
+	slim_register_board_info(t6whl_slim_devices,
+		ARRAY_SIZE(t6whl_slim_devices));
+	t6whl_init_dsps();
 	msm_spm_init(msm_spm_data, ARRAY_SIZE(msm_spm_data));
 	msm_spm_l2_init(msm_spm_l2_data);
 #if 0 
@@ -5301,11 +5213,11 @@ static void __init t6wl_common_init(void)
 		rc = sysfs_create_group(properties_kobj, &properties_attr_group);
 	}
 
-	t6wl_receiver_init();
-	t6wl_init_keypad();
+	t6whl_receiver_init();
+	t6whl_init_keypad();
 #ifdef CONFIG_FPR_SPI
-    printk("[fp] t6wl_validity_fingerprint_spi_init call\n");
-    t6wl_validity_fingerprint_spi_init();
+    printk("[fp] t6whl_validity_fingerprint_spi_init call\n");
+    t6whl_validity_fingerprint_spi_init();
 #endif
 #ifdef CONFIG_SUPPORT_USB_SPEAKER
 	pm_qos_add_request(&pm_qos_req_dma, PM_QOS_CPU_DMA_LATENCY, PM_QOS_DEFAULT_VALUE);
@@ -5319,16 +5231,16 @@ static void __init t6wl_common_init(void)
 #endif
 }
 
-static void __init t6wl_allocate_memory_regions(void)
+static void __init t6whl_allocate_memory_regions(void)
 {
 	t6_allocate_fb_region();
 }
 
-static void __init t6wl_cdp_init(void)
+static void __init t6whl_cdp_init(void)
 {
 	pr_info("%s: init starts\r\n", __func__);
 	msm_tsens_early_init(&apq_tsens_pdata);
-	t6wl_common_init();
+	t6whl_common_init();
 	ethernet_init();
 	msm_rotator_set_split_iommu_domain();
 	platform_add_devices(cdp_devices, ARRAY_SIZE(cdp_devices));
@@ -5368,7 +5280,7 @@ static void __init t6wl_cdp_init(void)
 	
 	
 	if (!(board_mfg_mode() == 6 || board_mfg_mode() == 7))
-		t6wl_add_usb_devices();
+		t6whl_add_usb_devices();
 }
 
 #define PHY_BASE_ADDR1  0x80600000
@@ -5385,7 +5297,7 @@ static void __init t6wl_cdp_init(void)
 int __init parse_tag_memsize(const struct tag *tags);
 static unsigned int mem_size_mb;
 
-static void __init t6wl_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
+static void __init t6whl_fixup(struct tag *tags, char **cmdline, struct meminfo *mi)
 {
 	mem_size_mb = parse_tag_memsize((const struct tag *)tags);
 	printk(KERN_DEBUG "%s: mem_size_mb=%u\n, mfg_mode = %d", __func__, mem_size_mb, board_mfg_mode());
@@ -5407,15 +5319,15 @@ static void __init t6wl_fixup(struct tag *tags, char **cmdline, struct meminfo *
 	printk(KERN_INFO "M7CDTU_fixup:skuid=0x%x\n", skuid);
 }
 
-MACHINE_START(T6_WL, "UNKNOWN")
-	.fixup = t6wl_fixup,
-	.map_io = t6wl_map_io,
-	.reserve = t6wl_reserve,
-	.init_irq = t6wl_init_irq,
+MACHINE_START(T6_WHL, "UNKNOWN")
+	.fixup = t6whl_fixup,
+	.map_io = t6whl_map_io,
+	.reserve = t6whl_reserve,
+	.init_irq = t6whl_init_irq,
 	.handle_irq = gic_handle_irq,
 	.timer = &msm_timer,
-	.init_machine = t6wl_cdp_init,
-	.init_early = t6wl_allocate_memory_regions,
-	.init_very_early = t6wl_early_reserve,
+	.init_machine = t6whl_cdp_init,
+	.init_early = t6whl_allocate_memory_regions,
+	.init_very_early = t6whl_early_reserve,
 	.restart = msm_restart,
 MACHINE_END

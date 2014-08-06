@@ -12,7 +12,7 @@
 
 #ifndef _ARCH_ARM_MACH_MSM_IPC_ROUTER_H
 #define _ARCH_ARM_MACH_MSM_IPC_ROUTER_H
-#if defined(CONFIG_MACH_M7_WLV)
+#if defined(CONFIG_MACH_DUMMY)
 
 #include <linux/types.h>
 #include <linux/socket.h>

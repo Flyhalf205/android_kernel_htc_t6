@@ -1102,16 +1102,44 @@ netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
 
 	spin_lock_irqsave(&dev->txq.lock, flags);
 	retval = usb_autopm_get_interface_async(dev->intf);
+#ifdef CONFIG_RIL_PCN001_HTC_QUEUE_URB_TO_DEFERRED_ANCHOR
+	
+	if (retval < 0 && ( retval != -EACCES ) ) {
+#else
 	if (retval < 0) {
+#endif
 		spin_unlock_irqrestore(&dev->txq.lock, flags);
 		netdev_info(dev->net, "%s  usb_autopm_get_interface_async return: %d\n",__func__, retval);
 		goto drop;
+#ifdef CONFIG_RIL_PCN001_HTC_QUEUE_URB_TO_DEFERRED_ANCHOR
+	} else if ( retval == -EACCES ) {
+		netdev_info(dev->net, "%s  usb_autopm_get_interface_async return: %d, try Delaying transmission for resumption\n",__func__, retval);
+#endif
 	} else if (retval > 0)
 		netdev_info(dev->net, "%s  usb_autopm_get_interface_async return: %d\n",__func__, retval);
 
 #ifdef CONFIG_PM
+#ifdef CONFIG_RIL_PCN001_HTC_QUEUE_URB_TO_DEFERRED_ANCHOR
+	
+	if ( retval == -EACCES ) {
+		usb_anchor_urb(urb, &dev->deferred);
+		
+		netif_stop_queue(net);
+		usb_put_urb(urb);
+		spin_unlock_irqrestore(&dev->txq.lock, flags);
+		netdev_info(dev->net, "Delaying transmission for resumption\n");
+
+		
+		dev->udev->bus->skip_resume = false;
+
+		goto deferred;
+	}
+	
+	else if (test_bit(EVENT_DEV_ASLEEP, &dev->flags)) {
+#else
 	
 	if (test_bit(EVENT_DEV_ASLEEP, &dev->flags)) {
+#endif
 		
 		usb_anchor_urb(urb, &dev->deferred);
 		
@@ -1367,6 +1395,9 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 	init_timer (&dev->delay);
 	mutex_init (&dev->phy_mutex);
 
+	dev->dbg_idx = 0;
+	dev->dbg_lock = __RW_LOCK_UNLOCKED(lck);
+
 	dev->net = net;
 	strcpy (net->name, "usb%d");
 	memcpy (net->dev_addr, node_id, sizeof node_id);
@@ -1507,7 +1538,6 @@ int usbnet_resume (struct usb_interface *intf)
 
 		spin_lock_irq(&dev->txq.lock);
 		while ((res = usb_get_from_anchor(&dev->deferred))) {
-
 			skb = (struct sk_buff *)res->context;
 			retval = usb_submit_urb(res, GFP_ATOMIC);
 			if (retval < 0) {
@@ -1520,6 +1550,12 @@ int usbnet_resume (struct usb_interface *intf)
 			}
 		}
 
+#ifdef CONFIG_RIL_PCN001_HTC_QUEUE_URB_TO_DEFERRED_ANCHOR
+		if ( dev->udev->bus->skip_resume == false ) {
+			pr_info("%s: set skip_resume to true\n", __func__);
+			dev->udev->bus->skip_resume = true;
+		}
+#endif
 		smp_mb();
 		clear_bit(EVENT_DEV_ASLEEP, &dev->flags);
 		spin_unlock_irq(&dev->txq.lock);

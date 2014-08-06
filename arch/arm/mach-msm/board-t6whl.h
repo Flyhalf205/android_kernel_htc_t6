@@ -10,8 +10,8 @@
  * GNU General Public License for more details.
  */
 
-#ifndef __ARCH_ARM_MACH_MSM_BOARD_T6WL_H
-#define __ARCH_ARM_MACH_MSM_BOARD_T6WL_H
+#ifndef __ARCH_ARM_MACH_MSM_BOARD_T6WHL_H
+#define __ARCH_ARM_MACH_MSM_BOARD_T6WHL_H
 
 #include <linux/regulator/msm-gpio-regulator.h>
 #include <linux/mfd/pm8xxx/pm8921.h>
@@ -31,7 +31,7 @@
 #define GPIO(x) (x)
 #define PMGPIO(x) (x)
 
-int __init t6wl_init_keypad(void);
+int __init t6whl_init_keypad(void);
 
 #define MSM_LCD_TE					GPIO(0)
 #define MSM_RAW_RSTz				GPIO(1)
@@ -240,8 +240,8 @@ int __init apq8064_add_sdcc(unsigned int controller,
 void t6_init_mmc(void);
 int t6_wifi_init(void);
 void t6_init_gpiomux(void);
-void t6wl_init_pmic(void);
-void t6wl_init_pmic_register_cam_cb(void *cam_vcm_on_cb, void *cam_vcm_off_cb);
+void t6whl_init_pmic(void);
+void t6whl_init_pmic_register_cam_cb(void *cam_vcm_on_cb, void *cam_vcm_off_cb);
 
 #if 1	
 extern struct platform_device t6china_msm_rawchip_device;
@@ -261,7 +261,7 @@ void t6_allocate_fb_region(void);
 void t6_mdp_writeback(struct memtype_reserve *reserve_table);
 
 void t6_init_gpu(void);
-void t6wl_pm8xxx_gpio_mpp_init(void);
+void t6whl_pm8xxx_gpio_mpp_init(void);
 void t6_usb_uart_switch(int nvbus);
 
 #ifdef CONFIG_RESET_BY_CABLE_IN

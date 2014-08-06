@@ -7,9 +7,6 @@ obj-$(CONFIG_MSM_CAMERA_SENSOR) += msm_sensor.o
 obj-$(CONFIG_OV5647) += ov5647_v4l2.o
 obj-$(CONFIG_IMX091) += imx091_v4l2.o
 obj-$(CONFIG_IMX175) += imx175_v4l2.o
-obj-$(CONFIG_MACH_ELITE) += imx175_2lane_v4l2.o
-obj-$(CONFIG_MACH_JET) += imx175_2lane_v4l2.o
-obj-$(CONFIG_MACH_EVITA_UTL) += imx175_2lane_v4l2.o
 obj-$(CONFIG_IMX135) += imx135_v4l2.o
 ifdef CONFIG_CAMERA_IMAGE_NONE_BOARD
 obj-$(CONFIG_OV4688) += ov4688_non_v4l2.o
@@ -35,5 +32,4 @@ obj-$(CONFIG_OV2722) += ov2722_v4l2.o
 obj-$(CONFIG_OV5693) += ov5693_v4l2.o
 obj-$(CONFIG_S5K6A2YA) += s5k6a2ya_v4l2.o
 obj-$(CONFIG_MT9V113) += mt9v113_v4l2.o mt9v113_reg_lens_9251.o
-obj-$(CONFIG_S5K6AAFX) += s5k6aafx_v4l2.o s5k6aafx_reg_valentewx.o
 
