@@ -153,6 +153,11 @@ static int memfree_hist_print(struct seq_file *s, void *unused)
 	p = wptr;
 	for (;;) {
 		kgsl_get_memory_usage(str, sizeof(str), p->flags);
+		/*
+		 * if the ring buffer is not filled up yet
+		 * all its empty elems have size==0
+		 * just skip them ...
+		*/
 		if (p->size)
 			seq_printf(s, "%8d %08x %8d %11s\n",
 				p->pid, p->gpuaddr, p->size, str);
@@ -203,7 +208,7 @@ void kgsl_device_debugfs_init(struct kgsl_device *device)
 	debugfs_create_file("contexpid_dump",  0644, device->d_debugfs, device,
 				&ctx_dump_fops);
 
-	
+	/* Create postmortem dump control files */
 
 	pm_d_debugfs = debugfs_create_dir("postmortem", device->d_debugfs);
 
@@ -287,7 +292,7 @@ static int process_mem_print(struct seq_file *s, void *unused)
 	seq_printf(s, "%8s %8s %5s %5s %10s %16s %5s\n",
 		   "gpuaddr", "size", "id", "flags", "type", "usage", "sglen");
 
-	
+	/* print all entries with a GPU address */
 	spin_lock(&private->mem_lock);
 
 	for (node = rb_first(&private->mem_rb); node; node = rb_next(node)) {
@@ -297,7 +302,7 @@ static int process_mem_print(struct seq_file *s, void *unused)
 
 	spin_unlock(&private->mem_lock);
 
-	
+	/* now print all the unbound entries */
 	while (1) {
 		rcu_read_lock();
 		entry = idr_get_next(&private->mem_idr, &next);

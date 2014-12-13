@@ -256,6 +256,14 @@ static void rmnet_usb_ctrl_read_timer_expire(unsigned long data)
 {
 	struct rmnet_ctrl_dev *dev = (struct rmnet_ctrl_dev *)data;
 
+	
+	if ( !dev ) {
+		expired_rcvurb = NULL;
+		pr_err("[RMNET][%s] dev is NULL\n", __func__);
+		return;
+	}
+	
+
 	dev_err(dev->devicep, "[RMNET][%s] %s rcv_timer expire !!! \n", __func__, dev->name);
 
 	
@@ -264,9 +272,11 @@ static void rmnet_usb_ctrl_read_timer_expire(unsigned long data)
 		log_rmnet_usb_ctrl_event(dev->intf, "Rx timeout", 0);
 	#endif	
 	
-
-	expired_rcvurb = dev->rcvurb;
-	schedule_delayed_work_on(0, &kill_rcv_urb_delay_work, 10);
+	if( NULL == expired_rcvurb ) {
+		pr_info("[RMNET][%s] Read urb %p expire\n", __func__, expired_rcvurb);
+		expired_rcvurb = dev->rcvurb;
+		schedule_delayed_work_on(0, &kill_rcv_urb_delay_work, 10);
+	}
 }
 #endif	
 
@@ -551,18 +561,26 @@ resubmit_int_urb:
 #endif
 	
 	
-	if (!dev->inturb->anchor) {
-		usb_mark_last_busy(udev);
-		usb_anchor_urb(dev->inturb, &dev->rx_submitted);
-		status = usb_submit_urb(dev->inturb, GFP_ATOMIC);
-		if (status) {
-			usb_unanchor_urb(dev->inturb);
-			if (status != -ENODEV)
-				dev_err(dev->devicep,
-				"%s: Error re-submitting Int URB %d\n",
-				__func__, status);
+	
+	
+	
+	if ( dev->inturb ) {
+		if (!dev->inturb->anchor) {
+			usb_mark_last_busy(udev);
+			usb_anchor_urb(dev->inturb, &dev->rx_submitted);
+			status = usb_submit_urb(dev->inturb, GFP_ATOMIC);
+			if (status) {
+				usb_unanchor_urb(dev->inturb);
+				if (status != -ENODEV)
+					dev_err(dev->devicep,
+					"%s: Error re-submitting Int URB %d\n",
+					__func__, status);
+			}
 		}
+	} else {
+		dev_err(dev->devicep, "%s: dev->inturb is NULL\n", __func__);
 	}
+	
 }
 
 int rmnet_usb_ctrl_start_rx(struct rmnet_ctrl_dev *dev)
@@ -838,7 +856,7 @@ static int rmnet_ctl_open(struct inode *inode, struct file *file)
 					__func__, dev->name);
 
 #ifdef HTC_MDM_RESTART_IF_RMNET_OPEN_TIMEOUT
-		if (jiffies_to_msecs(jiffies - dev->connected_jiffies) > RMNET_OPEN_TIMEOUT_MS) {
+		if ((dev->claimed) && jiffies_to_msecs(jiffies - dev->connected_jiffies) > RMNET_OPEN_TIMEOUT_MS) {
 			dev_err(dev->devicep, "%s[%d]:dev->connected_jiffies:%lu jiffies:%lu\n", __func__, __LINE__, dev->connected_jiffies, jiffies);
 			dev_err(dev->devicep, "%s[%d]:htc_ehci_trigger_mdm_restart!!!\n", __func__, __LINE__);
 			htc_ehci_trigger_mdm_restart();

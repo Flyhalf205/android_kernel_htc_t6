@@ -83,4 +83,4 @@ int ioext_gpio_get_value(uint8_t gpio);
 int ioext_read_gpio_status(uint8_t *data);
 void ioext_register_ops(struct ioext_ops *ops);
 
-#endif 
+#endif /* _LINUX_ATMEGA_MICROP_H */

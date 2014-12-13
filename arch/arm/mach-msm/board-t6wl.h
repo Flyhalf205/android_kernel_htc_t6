@@ -33,6 +33,7 @@
 
 int __init t6wl_init_keypad(void);
 
+/* Platform dependent definition */
 #define MSM_LCD_TE					GPIO(0)
 #define MSM_RAW_RSTz				GPIO(1)
 #define RAW_RST		GPIO(1)
@@ -189,6 +190,7 @@ int __init t6wl_init_keypad(void);
 #define PM_TP_RSTz					PMGPIO(43)
 #define PM_LCD_ID1					PMGPIO(44)
 
+/* Macros assume PMIC GPIOs and MPPs start at 1 */
 #define PM8921_GPIO_BASE		NR_GPIO_IRQS
 #define PM8921_GPIO_PM_TO_SYS(pm_gpio)	(pm_gpio - 1 + PM8921_GPIO_BASE)
 #define PM8921_MPP_BASE			(PM8921_GPIO_BASE + PM8921_NR_GPIOS)
@@ -208,6 +210,7 @@ int __init t6wl_init_keypad(void);
 #define PM2QSC_PWR_EN		PM8921_GPIO_PM_TO_SYS(8)
 #define PM2QSC_KEYPADPWR	PM8921_GPIO_PM_TO_SYS(16)
 
+/* extra gpio for 1080p panel */
 #define BL_HW_EN_MPP_8		PM8921_MPP_PM_TO_SYS(8)
 #define LCM_N5V_EN_MPP_9	PM8921_MPP_PM_TO_SYS(9)
 #define LCM_P5V_EN_MPP_10	PM8921_MPP_PM_TO_SYS(10)
@@ -241,9 +244,11 @@ void t6_init_mmc(void);
 int t6_wifi_init(void);
 void t6_init_gpiomux(void);
 void t6wl_init_pmic(void);
+/* HTC_START - for HW VCM work-around */
 void t6wl_init_pmic_register_cam_cb(void *cam_vcm_on_cb, void *cam_vcm_off_cb);
+/* HTC_END */
 
-#if 1	
+#if 1	// for pre-evt no camera
 extern struct platform_device t6china_msm_rawchip_device;
 #endif
 void t6china_init_cam(void);

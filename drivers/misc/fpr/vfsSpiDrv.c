@@ -75,7 +75,7 @@ unsigned int freqTable[] = {
 
 #define DISABLE_FP 0
 
-int fpr_sensor = 0; 
+int fpr_sensor = 0; /* COF = 1, BGA = 0 */
 int COF_enable = 0;
 int fp_mount = 0;
 module_param(fp_mount,int,0444);
@@ -88,6 +88,7 @@ struct fingerprint_pdata_struct {
 
 struct fingerprint_pdata_struct *fingerprint_pdata;
 
+/* SPI driver info */
 struct spi_driver vfsspi_spi = {
 	.driver = {
 		.name  = "validity_fingerprint",
@@ -97,6 +98,7 @@ struct spi_driver vfsspi_spi = {
 	.remove = __devexit_p(vfsspi_remove),
 };
 
+/* file operations associated with device */
 static const struct file_operations vfsspi_fops = {
 	.owner   = THIS_MODULE,
 	.write   = vfsspi_write,
@@ -121,6 +123,7 @@ static int dataToRead;
 static int suspend = 0;
 static int hasfp = 0;
 
+/* Process kernel command-line parameter at boot time.  androidboot.hasfp=0 or androidboot.hasfp=1. */
 static int __init fingerprint_mount(char *str)
 {
 
@@ -190,6 +193,7 @@ static DEVICE_ATTR(fpr, 0644, fpr_read, fpr_write);
 
 inline void shortToLittleEndian(char *buf, size_t len)
 {
+/* PLATFORM_BIG_ENDIAN */
 	int i = 0;
 	int j = 0;
 	for (i = 0; i < len; i++, j++) {
@@ -201,7 +205,7 @@ inline void shortToLittleEndian(char *buf, size_t len)
 		j++;
 		buf[j] = LSB;
 	}
-} 
+} /* shortToLittleEndian */
 
 
 irqreturn_t vfsspi_irq(int irq, void *context)
@@ -219,7 +223,7 @@ int vfsspi_sendDrdySignal(struct vfsspi_devData *vfsSpiDev)
 	int ret = 0;
 	if (vfsSpiDev->userPID != 0) {
 		rcu_read_lock();
-		
+		/* find the task_struct associated with userpid */
 		t = pid_task(find_pid_ns(vfsSpiDev->userPID, &init_pid_ns),
 								 PIDTYPE_PID);
 		if (t == NULL) {
@@ -228,7 +232,7 @@ int vfsspi_sendDrdySignal(struct vfsspi_devData *vfsSpiDev)
 			return -ENODEV;
 		}
 		rcu_read_unlock();
-		
+		/* notify DRDY signal to user process */
 		ret = send_sig_info(vfsSpiDev->signalID,
 					 (struct siginfo *)1, t);
 		if (ret < 0)
@@ -250,7 +254,7 @@ void vfsspi_early_suspend(struct early_suspend *h)
 	if ( vfsSpiDevTmp != NULL ) {
 		if (vfsSpiDevTmp->eUserPID != 0) {
 			rcu_read_lock();
-			
+			/* find the task_struct associated with userpid */
 			printk("[fp]Searching task with PID=%08x\n", vfsSpiDevTmp->eUserPID);
 			t = pid_task(find_pid_ns(vfsSpiDevTmp->eUserPID, &init_pid_ns),
 					 PIDTYPE_PID);
@@ -260,7 +264,7 @@ void vfsspi_early_suspend(struct early_suspend *h)
 				return;
 			}
 			rcu_read_unlock();
-			
+			/* notify DRDY signal to user process */
 			ret =
 				send_sig_info(vfsSpiDevTmp->eSignalID, (struct siginfo *)1,
 					  t);
@@ -282,7 +286,7 @@ void vfsspi_late_resume(struct early_suspend *h)
 	if ( vfsSpiDevTmp != NULL ) {
 		if (vfsSpiDevTmp->eUserPID != 0) {
 			rcu_read_lock();
-			
+			/* find the task_struct associated with userpid */
 			printk("[fp]Searching task with PID=%08x\n", vfsSpiDevTmp->eUserPID);
 			t = pid_task(find_pid_ns(vfsSpiDevTmp->eUserPID, &init_pid_ns),
 					 PIDTYPE_PID);
@@ -292,7 +296,7 @@ void vfsspi_late_resume(struct early_suspend *h)
 				return;
 			}
 			rcu_read_unlock();
-			
+			/* notify DRDY signal to user process */
 			ret =
 				send_sig_info(vfsSpiDevTmp->eSignalID, (struct siginfo *)1,
 					  t);
@@ -330,6 +334,7 @@ static inline ssize_t vfsspi_writeSync(struct vfsspi_devData *vfsSpiDev,
 	return status;
 }
 
+/* Return no.of bytes read >0. negative integer incase of error. */
 inline ssize_t vfsspi_readSync(struct vfsspi_devData *vfsSpiDev,
 				unsigned char *buf, size_t len)
 {
@@ -347,6 +352,9 @@ inline ssize_t vfsspi_readSync(struct vfsspi_devData *vfsSpiDev,
 	status = spi_sync(vfsSpiDev->spi, &m);
 	if (status == 0) {
 		status = m.actual_length;
+		/* FIXME: This is temporary workaround for Fluid,
+		instead of returning actual read data length
+		spi_sync is returning 0 */
 		  status = len;
 	}
     else
@@ -414,16 +422,16 @@ ssize_t vfsspi_read(struct file *filp, char __user *buf, size_t count,
     } else if (status > DEFAULT_BUFFER_SIZE) {
         printk("[fp]vfsspi_read, status > DEFAULT_BUFFER_SIZE; status = %d\n",status);
     } else if (status > vfsSpiDev->streamBufSize) {
-        
+        /*printk("[fp]: vfsspi_read, status > vfsSpiDev->streamBufSize; status = %d\n",status);*/
     }
 	if (status > 0) {
 		unsigned long missing = 0;
-		
+		/* data read. Copy to user buffer.*/
 		shortToLittleEndian((char *)readBuf, status);
 		missing = copy_to_user(buf, readBuf, status);
 		if (missing == status) {
 			printk("[fp]vfsspi_read: copy_to_user failed\n");
-			
+			/* Nothing was copied to user space buffer. */
 			status = -EFAULT;
 		} else {
 			status = status - missing;
@@ -556,7 +564,7 @@ long vfsspi_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				switch (clock) {
 				case 0:
 				{
-					
+					/* Running baud rate. */
 					DPRINTK("[fp]Running baud rate.\n");
 					spidev->max_speed_hz = MAX_BAUD_RATE;
 					vfsSpiDev->curSpiSpeed = MAX_BAUD_RATE;
@@ -564,7 +572,7 @@ long vfsspi_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				}
 				case 0xFFFF:
 				{
-					
+					/* Slow baud rate */
 					DPRINTK("[fp]slow baud rate.\n");
 					spidev->max_speed_hz = SLOW_BAUD_RATE;
 					vfsSpiDev->curSpiSpeed = SLOW_BAUD_RATE;
@@ -621,9 +629,11 @@ long vfsspi_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 				}
 				endTime = jiffies;
 				if (endTime - startTime >= timeout) {
-					
+					/* Timed out for waiting to wake up event. */
 					timeout = 0;
 				} else {
+					/* Thread is woke up by spurious event. Calculate a new
+					timeout and continue to wait DRDY signal assertion. */
 					timeout -= endTime - startTime;
 					startTime = endTime;
 				}
@@ -883,12 +893,12 @@ void vfsspi_hardReset(struct vfsspi_devData *vfsSpiDev)
 {
 	if (vfsSpiDev != NULL) {
 	    printk("[fp]vfsspi_hardReset\n");
-		
+		/*spin_lock(&vfsSpiDev->vfsSpiLock);*/
 		dataToRead = 0;
         fingerprint_pdata->set_sleep_pin(vfsSpiDev->sleepPin, 1);
 		mdelay(1);
         fingerprint_pdata->set_sleep_pin(vfsSpiDev->sleepPin, 0);
-		
+		/*spin_unlock(&vfsSpiDev->vfsSpiLock);*/
 		mdelay(5);
 	}
 }
@@ -897,10 +907,10 @@ void vfsspi_suspend(struct vfsspi_devData *vfsSpiDev)
 {
 	if (vfsSpiDev != NULL) {
         printk("[fp]vfsspi_suspend\n");
-		
+		/*spin_lock(&vfsSpiDev->vfsSpiLock);*/
 		dataToRead = 0;
         fingerprint_pdata->set_sleep_pin(vfsSpiDev->sleepPin, 1);
-		
+		/*spin_unlock(&vfsSpiDev->vfsSpiLock);*/
 	}
 }
 
@@ -1007,7 +1017,7 @@ void fpr_test(struct spi_device *spi)
   PerformReset();
   mdelay(5);
 
-  
+  /* Test the SPI driver reply quick */
   memset(&t, 0, sizeof(t));
   t.tx_buf = tx_buf;
   t.rx_buf = rx_buf;
@@ -1021,7 +1031,7 @@ void fpr_test(struct spi_device *spi)
         printk(KERN_ERR "rx[%d] = 0x%0x ", i, rx_buf[i]);
   memset(tx_buf, 0, sizeof(tx_buf));
   memset(rx_buf, 0, sizeof(rx_buf));
-  
+  /* Get firmware version { 45 67 01 23 00 01 01 01 00 01 00 ….00} */
   tx_buf[0] = 0x45;
   tx_buf[1] = 0x67;
   tx_buf[2] = 0x01;
@@ -1070,8 +1080,8 @@ again:
         for(i=0;i<64;i++)
             printk(KERN_ERR "  rx[%d] = 0x%0x  ", i, rx_buf[i]);
 
-        
-        if(fingerprint_pdata->read_engineerid()) 
+        //Judge COF or BGA
+        if(fingerprint_pdata->read_engineerid()) //COF
         {
             printk(KERN_ERR "[fp]ValiditySensor COF\n");
             fpr_sensor = 1  ;
@@ -1104,7 +1114,7 @@ int vfsspi_probe(struct spi_device *spi)
 		fp_mount = 0;
 		return -ENODEV;
   }
-    
+    /* Quickly test with fpr component via spi*/
 	fpr_test(spi);
     if(fpr_sensor == 1)
     {
@@ -1122,7 +1132,7 @@ int vfsspi_probe(struct spi_device *spi)
 	vfsSpiDev = kzalloc(sizeof(*vfsSpiDev), GFP_KERNEL);
 	if (vfsSpiDev == NULL)
 		return -ENOMEM;
-	
+	/* Initialize driver data. */
 	vfsSpiDev->curSpiSpeed = SLOW_BAUD_RATE;
 	vfsSpiDev->userInfoData.buffer = NULL;
 	vfsSpiDev->spi = spi;
@@ -1137,7 +1147,7 @@ int vfsspi_probe(struct spi_device *spi)
 		status = spi_setup(spi);
 		if (status == 0) {
 			mutex_lock(&deviceListMutex);
-			
+			/* Create device node */
 			vfsSpiDev->devt = MKDEV(VFSSPI_MAJOR, 0);
 			dev = device_create(vfsSpiDevClass, &spi->dev,
 				 vfsSpiDev->devt, vfsSpiDev, "vfsspi");
@@ -1192,7 +1202,7 @@ int vfsspi_remove(struct spi_device *spi)
 		vfsspi_platformUninit(vfsSpiDev);
 		if (vfsSpiDev->userInfoData.buffer != NULL)
 			kfree(vfsSpiDev->userInfoData.buffer);
-		
+		/* Remove device entry. */
 		list_del(&vfsSpiDev->deviceEntry);
 		device_destroy(vfsSpiDevClass, vfsSpiDev->devt);
 		kfree(vfsSpiDev);
@@ -1254,7 +1264,7 @@ static int __init vfsspi_init(void)
 {
 	int status = 0;
 	DPRINTK("[fp]vfsspi_init\n");
-	
+	/* register major number for character device */
 	status = register_chrdev(VFSSPI_MAJOR, "validity_fingerprint",
 							 &vfsspi_fops);
 	if (status < 0) {

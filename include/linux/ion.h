@@ -98,7 +98,7 @@ enum cp_mem_usage {
 
 #define ION_IS_CACHED(__flags)	((__flags) & (1 << ION_CACHE_SHIFT))
 
-#ifdef CONFIG_ARCH_MSM8930
+#ifdef CONFIG_ARCH_DUMMY
 #define ION_IOMMU_UNMAP_DELAYED 0
 #else
 #define ION_IOMMU_UNMAP_DELAYED 1
@@ -408,6 +408,12 @@ struct ion_flag_data {
 	unsigned long flags;
 };
 
+#define ION_CLIENT_NAME_LENGTH 64
+struct ion_client_name_data {
+	int len;
+	char* name;
+};
+
 #define ION_IOC_MAGIC		'I'
 
 #define ION_IOC_ALLOC		_IOWR(ION_IOC_MAGIC, 0, \
@@ -435,6 +441,9 @@ struct ion_flag_data {
 
 #define ION_IOC_GET_FLAGS_OLD		_IOWR(ION_IOC_MAGIC, 10, \
 						struct ion_flag_data)
+
+#define ION_IOC_CLIENT_RENAME		_IOWR(ION_IOC_MAGIC, 12, \
+						struct ion_client_name_data)
 
 #define ION_IOC_MSM_MAGIC 'M'
 

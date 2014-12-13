@@ -1679,7 +1679,7 @@ static void hci_cc_station_rsp(struct radio_hci_dev *hdev, struct sk_buff *skb)
 	struct hci_fm_station_rsp *rsp = (void *)skb->data;
 	radio->fm_st_rsp = *(rsp);
 
-	
+	/* Tune is always succesful */
 	radio_hci_req_complete(hdev, 0);
 }
 
@@ -2259,6 +2259,9 @@ void radio_hci_event_packet(struct radio_hci_dev *hdev, struct sk_buff *skb)
 	}
 }
 
+/*
+ * fops/IOCTL helper functions
+ */
 
 static int iris_search(struct iris_device *radio, int on, int dir)
 {
@@ -2374,6 +2377,8 @@ static int iris_recv_set_region(struct iris_device *radio, int req_region)
 			REGION_JAPAN_WIDE_BAND_HIGH;
 		break;
 	default:
+		/* The user specifies the value.
+		   So nothing needs to be done */
 		break;
 	}
 
@@ -2694,7 +2699,7 @@ static int iris_vidioc_s_ext_ctrls(struct file *file, void *priv,
 	switch ((ctrl->controls[0]).id) {
 	case V4L2_CID_RDS_TX_PS_NAME:
 		FMDBG("In V4L2_CID_RDS_TX_PS_NAME\n");
-		
+		/*Pass a sample PS string */
 
 		memset(tx_ps.ps_data, 0, MAX_PS_LENGTH);
 		bytes_to_copy = min((int)(ctrl->controls[0]).size,
@@ -2735,12 +2740,20 @@ static int iris_vidioc_s_ext_ctrls(struct file *file, void *priv,
 	case V4L2_CID_PRIVATE_IRIS_WRITE_DEFAULT:
 		data = (ctrl->controls[0]).string;
 		memset(&default_data, 0, sizeof(default_data));
+		/*
+		 * Check if length of the 'FM Default Data' to be sent
+		 * is within the maximum  'FM Default Data' packet limit.
+		 * Max. 'FM Default Data' packet length is 251 bytes:
+		 *	1 byte    - XFR Mode
+		 *	1 byte    - length of the default data
+		 *	249 bytes - actual data to be configured
+		 */
 		if (ctrl->controls[0].size > (DEFAULT_DATA_SIZE + 2)) {
 			pr_err("%s: Default data buffer overflow!\n", __func__);
 			return -EINVAL;
 		}
 
-		
+		/* copy only 'size' bytes of data as requested by user */
 		retval = copy_from_user(&default_data, data,
 			ctrl->controls[0].size);
 		if (retval > 0) {
@@ -2751,6 +2764,13 @@ static int iris_vidioc_s_ext_ctrls(struct file *file, void *priv,
 		FMDBG("%s: XFR Mode\t: 0x%x\n", __func__, default_data.mode);
 		FMDBG("%s: XFR Data Length\t: %d\n", __func__,
 			default_data.length);
+		/*
+		 * Check if the 'length' of the actual XFR data to be configured
+		 * is valid or not. Length of actual XFR data should be always
+		 * 2 bytes less than the total length of the 'FM Default Data'.
+		 * Length of 'FM Default Data' DEF_DATA_LEN: (1+1+XFR Data Size)
+		 * Length of 'Actual XFR Data' XFR_DATA_LEN: (DEF_DATA_LEN - 2)
+		 */
 		if (default_data.length != (ctrl->controls[0].size - 2)) {
 			pr_err("%s: Invalid 'length' parameter passed for "
 				"actual xfr data\n", __func__);
@@ -3043,7 +3063,7 @@ static int iris_vidioc_s_ctrl(struct file *file, void *priv,
 				radio->fm_hdev);
 		break;
 	case V4L2_CID_PRIVATE_IRIS_AF_JUMP:
-		
+		/*Clear the current AF jump settings*/
 		radio->g_rds_grp_proc_ps &= ~(1 << RDS_AF_JUMP_OFFSET);
 		radio->af_jump_bit = ctrl->value;
 		rds_grps_proc = 0x00;
@@ -3230,6 +3250,11 @@ static int iris_vidioc_s_ctrl(struct file *file, void *priv,
 
 	case V4L2_CID_PRIVATE_IRIS_SRCH_ALGORITHM:
 	case V4L2_CID_PRIVATE_IRIS_SET_AUDIO_PATH:
+		/*
+		These private controls are place holders to keep the
+		driver compatible with changes done in the frameworks
+		which are specific to TAVARUA.
+		*/
 		retval = 0;
 		break;
 	case V4L2_CID_PRIVATE_SPUR_FREQ:
@@ -3275,12 +3300,22 @@ static int update_spur_table(struct iris_device *radio)
 
 	memset(&default_data, 0, sizeof(default_data));
 
-	
+	/* Pass the mode of SPUR_CLK */
 	default_data.mode = CKK_SPUR;
 
 	temp = radio->spur_table_size;
 	for (cnt = 0; cnt < (temp / 5); cnt++) {
 		offset = 0;
+		/*
+		 * Program the spur entries in spur table in following order:
+		 *    Spur index
+		 *    Length of the spur data
+		 *    Spur Data:
+		 *        MSB of the spur frequency
+		 *        LSB of the spur frequency
+		 *        Enable/Disable the spur frequency
+		 *        RMSSI value of the spur frequency
+		 */
 		default_data.data[offset++] = ENTRY_0 + cnt;
 		for (i = 0; i < SPUR_ENTRIES_PER_ID; i++) {
 			default_data.data[offset++] = GET_FREQ(COMPUTE_SPUR(
@@ -3303,7 +3338,7 @@ static int update_spur_table(struct iris_device *radio)
 		}
 	}
 
-	
+	/* Compute balance SPUR frequencies to be programmed */
 	temp %= SPUR_ENTRIES_PER_ID;
 	if (temp > 0) {
 		offset = 0;
@@ -3443,6 +3478,10 @@ static int iris_vidioc_s_frequency(struct file *file, void *priv,
 	if (freq->type != V4L2_TUNER_RADIO)
 		return -EINVAL;
 
+	/* We turn off RDS prior to tuning to a new station.
+	   because of a bug in SoC which prevents tuning
+	   during RDS transmission.
+	 */
 	if (radio->mode == FM_TRANS
 		&& (radio->trans_conf.rds_std == 0 ||
 			radio->trans_conf.rds_std == 1)) {

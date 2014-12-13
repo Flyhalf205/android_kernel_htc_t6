@@ -890,7 +890,7 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.critical_alarm_vol_cols = sizeof(critical_alarm_voltage_mv) / sizeof(int),
 	.overload_vol_thr_mv = 4000,
 	.overload_curr_thr_ma = 0,
-	.smooth_chg_full_delay_min = 1,
+	.smooth_chg_full_delay_min = 3,
 	.shutdown_voltage_critiria_setting = 3400,
 	
 	.icharger.name = "pm8921",
@@ -928,6 +928,9 @@ static struct htc_battery_platform_data htc_battery_pdev_data = {
 	.igauge.get_battery_id = pm8921_get_batt_id,
 	.igauge.get_battery_soc = pm8921_bms_get_batt_soc,
 	.igauge.get_battery_cc = pm8921_bms_get_batt_cc,
+	.igauge.store_battery_data = pm8921_bms_store_battery_data_emmc,
+	.igauge.store_battery_ui_soc = pm8921_bms_store_battery_ui_soc,
+	.igauge.get_battery_ui_soc = pm8921_bms_get_battery_ui_soc,
 	.igauge.calculate_pj_level = pm8921_calculate_pj_level,
 	.igauge.is_battery_temp_fault = pm8921_is_batt_temperature_fault,
 	.igauge.is_battery_full = pm8921_is_batt_full,
@@ -1991,8 +1994,8 @@ void t6wl_add_usb_devices(void)
 
 	
 	if (board_mfg_mode() == 0) {
-		android_usb_pdata.nluns = 1;
-		android_usb_pdata.cdrom_lun = 0x1;
+		android_usb_pdata.nluns = 2;
+		android_usb_pdata.cdrom_lun = 0x3;
 	}
 	android_usb_pdata.serial_number = board_serialno();
 

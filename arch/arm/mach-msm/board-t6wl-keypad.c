@@ -116,7 +116,7 @@ static struct platform_device t6wl_keypad_device = {
 };
 
 static struct keyreset_platform_data t6wl_reset_keys_pdata = {
-	
+	/*.keys_up = 8064_reset_keys_up,*/
 	.keys_down = {
 		KEY_POWER,
 		KEY_VOLUMEDOWN,

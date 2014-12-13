@@ -40,6 +40,7 @@
 #ifdef pr_fmt
 #undef pr_fmt
 #endif
+//#define pr_fmt(fmt) MAX1187X_LOG_NAME "(%s:%d): " fmt, __func__, __LINE__
 #define pr_fmt(fmt) MAX1187X_LOG_NAME ": " fmt
 
 #ifdef pr_info
@@ -100,6 +101,7 @@ static struct data *gl_ts;
 struct max1187x_pdata local_pdata = { };
 #endif
 
+/* tanlist - array containing tan(i)*(2^16-1) for i=[0,45], i in degrees */
 u16 tanlist[] = {0, 1144, 2289, 3435, 4583, 5734,
 			6888, 8047, 9210, 10380, 11556, 12739,
 			13930, 15130, 16340, 17560, 18792, 20036,
@@ -109,6 +111,8 @@ u16 tanlist[] = {0, 1144, 2289, 3435, 4583, 5734,
 			47614, 49384, 51202, 53069, 54990, 56969,
 			59008, 61112, 63286, 65535};
 
+/* config num - touch, calib, private, lookup, image
+	p7 config num, p8 config num */
 u16 config_num[2][5] = {{42, 50, 23, 8, 1},
 					{65, 74, 34, 8, 0}};
 
@@ -143,9 +147,9 @@ struct data {
 	struct report_reader report_readers[MAX_REPORT_READERS];
 	u8 irq_disabled;
 	u8 report_readers_outstanding;
-	u16 rx_report[1000]; 
+	u16 rx_report[1000]; /* with header */
 	u16 rx_report_len;
-	u16 rx_packet[MAX_WORDS_REPORT + 1]; 
+	u16 rx_packet[MAX_WORDS_REPORT + 1]; /* with header */
 	u32 irq_count;
 	u16 framecounter;
 	u8 got_report;
@@ -244,6 +248,8 @@ static char *keycode_check(int keycode)
 	}
 }
 
+/* I2C communication */
+/* debug_mask |= 0x10000 for I2C RX communication */
 static int i2c_rx_bytes(struct data *ts, u8 *buf, u16 len)
 {
 	int i, ret, written;
@@ -318,6 +324,7 @@ static int i2c_rx_words(struct data *ts, u16 *buf, u16 len)
 	return len;
 }
 
+/* debug_mask |= 0x20000 for I2C TX communication */
 static int i2c_tx_bytes(struct data *ts, u8 *buf, u16 len)
 {
 	int i, ret, written;
@@ -391,6 +398,7 @@ static int i2c_tx_words(struct data *ts, u16 *buf, u16 len)
 	return len;
 }
 
+/* Read report */
 static int read_mtp_report(struct data *ts, u16 *buf)
 {
 	int words = 1, words_tx, words_rx;
@@ -398,7 +406,7 @@ static int read_mtp_report(struct data *ts, u16 *buf)
 	u16 address = 0x000A;
 
 	mutex_lock(&ts->i2c_mutex);
-	
+	/* read header, get size, read entire report */
 	words_tx = i2c_tx_words(ts, &address, 1);
 	if (words_tx != 1) {
 		mutex_unlock(&ts->i2c_mutex);
@@ -508,13 +516,14 @@ static int read_mtp_report(struct data *ts, u16 *buf)
 	return ret;
 }
 
+/* Send command */
 static int send_mtp_command(struct data *ts, u16 *buf, u16 len)
 {
-	u16 tx_buf[MAX_WORDS_COMMAND + 2]; 
+	u16 tx_buf[MAX_WORDS_COMMAND + 2]; /* with address and header */
 	u16 packets, words, words_tx;
 	int i, ret = 0;
 
-	
+	/* check basics */
 	if (len < 2) {
 		pr_err("Command too short (%d); 2 words minimum", len);
 		return -EINVAL;
@@ -531,7 +540,7 @@ static int send_mtp_command(struct data *ts, u16 *buf, u16 len)
 		return -EINVAL;
 	}
 
-	
+	/* packetize and send */
 	packets = len / MAX_WORDS_COMMAND;
 	if (len % MAX_WORDS_COMMAND)
 		packets++;
@@ -558,7 +567,9 @@ static int send_mtp_command(struct data *ts, u16 *buf, u16 len)
 	return ret;
 }
 
+/* Integer math operations */
 #if 0
+/* Returns index of element in array closest to val */
 static u16 binary_search(const u16 *array, u16 len, u16 val)
 {
 	s16 lt, rt, mid;
@@ -588,6 +599,9 @@ static u16 binary_search(const u16 *array, u16 len, u16 val)
 		return lt;
 }
 
+/* Given values of x and y, it calculates the orientation
+ * with respect to y axis by calculating atan(x/y)
+ */
 static s16 max1187x_orientation(s16 x, s16 y)
 {
 	u16 sign = 0;
@@ -760,6 +774,7 @@ static void button_report(struct data *ts, int index, int state)
 	}
 }
 
+/* debug_mask |= 0x40000 for touch reports */
 static void process_touch_report(struct data *ts, u16 *buf)
 {
 	u32 i;
@@ -951,7 +966,7 @@ static void process_touch_report(struct data *ts, u16 *buf)
 		pr_dbg(2, "Finger leave, Noise:%d, Cycles:%d", ts->noise_level, (ts->cycles == 1)? 32 : 16);
 	} else {
 		if (ts->vk_press) {
-			
+			//pr_info("Vkey pressed! Ignore finger event.");
 			return;
 		}
 		reportb = (struct max1187x_touch_report_basic *)
@@ -1061,13 +1076,24 @@ static void process_touch_report(struct data *ts, u16 *buf)
 					xsize = ysize;
 					ysize = swap_s16;
 				}
+				/* Calculate orientation as
+				 * arctan of xsize/ysize) */
 				orientation =
 					max1187x_orientation(xsize, ysize);
 				area = reporte->area
 					* (PDATA(lcd_x)/PDATA(num_rows))
 					* (PDATA(lcd_y)/PDATA(num_cols));
+				/* Major axis of ellipse if hypotenuse
+				 * formed by xsize and ysize */
 				major_axis = xsize*xsize + ysize*ysize;
 				major_axis = max1187x_sqrt(major_axis);
+				/* Minor axis can be reverse calculated
+				 * using the area of ellipse:
+				 * Area of ellipse =
+				 *		pi / 4 * Major axis * Minor axis
+				 * Minor axis =
+				 *		4 * Area / (pi * Major axis)
+				 */
 				minor_axis = (2 * area) / major_axis;
 				minor_axis = (minor_axis<<17) / MAX1187X_PI;
 				pr_info_if(4, "(TOUCH): Finger %u: " \
@@ -1165,7 +1191,7 @@ static irqreturn_t irq_handler(int irq, void *context)
 	if (gpio_get_value(ts->pdata->gpio_tirq) != 0)
 		return IRQ_HANDLED;
 
-	
+	/* disable_irq_nosync(ts->client->irq); */
 	atomic_inc(&ts->scheduled_work_irq);
 	ts->irq_receive_time = jiffies;
 	ts->irq_count++;
@@ -1193,7 +1219,7 @@ static irqreturn_t irq_handler(int irq, void *context)
 		propagate_report(ts, 0, ts->rx_packet);
 	}
 	atomic_dec(&ts->scheduled_work_irq);
-	
+	/* enable_irq(ts->client->irq); */
 	return IRQ_HANDLED;
 }
 
@@ -1422,7 +1448,7 @@ static ssize_t command_store(struct device *dev, struct device_attribute *attr,
 	char scan_buf[5];
 	int i;
 
-	count--; 
+	count--; /* ignore carriage return */
 	if ((count % 4) != 0) {
 		pr_err("words not properly defined");
 		return -EINVAL;
@@ -1455,7 +1481,7 @@ static ssize_t report_read(struct file *file, struct kobject *kobj,
 
 	payload = ts->rx_report_len;
 	full_packet = payload;
-	num_term_char = 2; 
+	num_term_char = 2; /* number of term char */
 	if (count < (4 * full_packet + num_term_char))
 		return -EIO;
 	if (count > (4 * full_packet + num_term_char))
@@ -1493,7 +1519,7 @@ static ssize_t config_show(struct device *dev, struct device_attribute *attr,
 
 	for(i=0; i<RETRY_TIMES; i++) {
 		DISABLE_IRQ();
-		
+		//Get touch configuration
 		ret = get_touch_config(ts->client);
 		if (ret < 0)
 			pr_info("[W] Failed to retrieve touch config");
@@ -1519,7 +1545,7 @@ static ssize_t config_show(struct device *dev, struct device_attribute *attr,
 
 	for(i=0; i<RETRY_TIMES; i++) {
 		DISABLE_IRQ();
-		
+		//Get calibration table
 		mtpdata[0]=0x0011;
 		mtpdata[1]=0x0000;
 		ret = send_mtp_command(ts, mtpdata, 2);
@@ -1547,7 +1573,7 @@ static ssize_t config_show(struct device *dev, struct device_attribute *attr,
 
 	for(i=0; i<RETRY_TIMES; i++) {
 		DISABLE_IRQ();
-		
+		//Get private configuration
 		mtpdata[0]=0x0004;
 		mtpdata[1]=0x0000;
 		ret = send_mtp_command(ts, mtpdata, 2);
@@ -1575,7 +1601,7 @@ static ssize_t config_show(struct device *dev, struct device_attribute *attr,
 
 	for(i=0; i<RETRY_TIMES; i++) {
 		DISABLE_IRQ();
-		
+		//Get Lookup table X
 		mtpdata[0]=0x0031;
 		mtpdata[1]=0x0001;
 		mtpdata[2]=0x0000;
@@ -1604,7 +1630,7 @@ static ssize_t config_show(struct device *dev, struct device_attribute *attr,
 
 	for(i=0; i<RETRY_TIMES; i++) {
 		DISABLE_IRQ();
-		
+		//Get Lookup table Y
 		mtpdata[0]=0x0031;
 		mtpdata[1]=0x0001;
 		mtpdata[2]=0x0001;
@@ -1777,6 +1803,7 @@ static DEVICE_ATTR(gpio, S_IRUGO, gpio_show, NULL);
 static DEVICE_ATTR(diag, (S_IWUSR|S_IRUGO), diag_show, diag_store);
 static DEVICE_ATTR(unlock, (S_IWUSR|S_IRUGO), NULL, unlock_store);
 
+/* debug_mask |= 0x80000 for all driver INIT */
 static void collect_chip_data(struct data *ts)
 {
 	int ret, i, build_number = 0;
@@ -1792,7 +1819,7 @@ static void collect_chip_data(struct data *ts)
 		release_report(ts);
 		ts->fw_responsive = 1;
 	}
-#if 0 
+#if 0 /* Debug report */
 	DISABLE_IRQ();
 	ret = get_report(ts, 0x0121, 500);
 	if (ret == 0) {
@@ -1997,7 +2024,7 @@ static void update_config(struct data *ts)
 	u16 mtpdata[]={0x0000, 0x0000, 0x0000};
 	u16 imagefactor_data[104];
 
-	
+	/* configure the chip */
 	if (ts->max11871_Touch_Configuration_Data) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
@@ -2028,7 +2055,7 @@ static void update_config(struct data *ts)
 	if (ts->max11871_Calibration_Table_Data) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
-			
+			//Get calibration table
 			mtpdata[0]=0x0011;
 			mtpdata[1]=0x0000;
 			ret = send_mtp_command(ts, mtpdata, 2);
@@ -2058,7 +2085,7 @@ static void update_config(struct data *ts)
 	if (ts->max11871_Private_Configuration_Data) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
-			
+			//Get private configuration
 			mtpdata[0]=0x0004;
 			mtpdata[1]=0x0000;
 			ret = send_mtp_command(ts, mtpdata, 2);
@@ -2088,7 +2115,7 @@ static void update_config(struct data *ts)
 	if (ts->max11871_Lookup_Table_X_Data) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
-			
+			//Get Lookup table X
 			mtpdata[0]=0x0031;
 			mtpdata[1]=0x0001;
 			mtpdata[2]=0x0000;
@@ -2119,7 +2146,7 @@ static void update_config(struct data *ts)
 	if (ts->max11871_Lookup_Table_Y_Data) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
-			
+			//Get Lookup table Y
 			mtpdata[0]=0x0031;
 			mtpdata[1]=0x0001;
 			mtpdata[2]=0x0001;
@@ -2150,7 +2177,7 @@ static void update_config(struct data *ts)
 	if (ts->max11871_Image_Factor_Table && config_num[ts->config_protocol][4]) {
 		for (i=0; i<RETRY_TIMES; i++) {
 			DISABLE_IRQ();
-			
+			//Get Image Factor Table
 			mtpdata[0]=0x0047;
 			mtpdata[1]=0x0000;
 			ret = send_mtp_command(ts, mtpdata, 2);
@@ -2177,8 +2204,8 @@ static void update_config(struct data *ts)
 			pr_err("Failed to receive Image Factor Table report");
 	}
 
-	
-	
+	//Configuration check has been done
+	//Now download correct configurations if required
 	if (reload_touch_config) {
 		pr_info_if(8, "(Config): Update Configuration Table");
 		DISABLE_IRQ();
@@ -2227,7 +2254,7 @@ static void update_config(struct data *ts)
 	if (reload_imagefactor_table && config_num[ts->config_protocol][4]) {
 		pr_info_if(8, "(Config): Update Image Factor Table");
 		DISABLE_IRQ();
-		
+		//0-59 words
 		imagefactor_data[0] = 0x0046;
 		imagefactor_data[1] = 0x003E;
 		imagefactor_data[2] = 0x0000;
@@ -2235,7 +2262,7 @@ static void update_config(struct data *ts)
 		imagefactor_data[63] = calculate_checksum(imagefactor_data+2,61);
 		send_mtp_command(ts, imagefactor_data, 64);
 		msleep(100);
-		
+		//60-159 words
 		imagefactor_data[0] = 0x0046;
 		imagefactor_data[1] = 0x0066;
 		imagefactor_data[2] = 0x003C;
@@ -2243,7 +2270,7 @@ static void update_config(struct data *ts)
 		imagefactor_data[103] = calculate_checksum(imagefactor_data+2,101);
 		send_mtp_command(ts, imagefactor_data, 104);
 		msleep(100);
-		
+		//160-259 words
 		imagefactor_data[0] = 0x0046;
 		imagefactor_data[1] = 0x0066;
 		imagefactor_data[2] = 0x00A0;
@@ -2251,7 +2278,7 @@ static void update_config(struct data *ts)
 		imagefactor_data[103] = calculate_checksum(imagefactor_data+2,101);
 		send_mtp_command(ts, imagefactor_data, 104);
 		msleep(100);
-		
+		//260-359 words
 		imagefactor_data[0] = 0x0046;
 		imagefactor_data[1] = 0x0066;
 		imagefactor_data[2] = 0x0104;
@@ -2259,7 +2286,7 @@ static void update_config(struct data *ts)
 		imagefactor_data[103] = calculate_checksum(imagefactor_data+2,101);
 		send_mtp_command(ts, imagefactor_data, 104);
 		msleep(100);
-		
+		//360-459 words
 		imagefactor_data[0] = 0x0046;
 		imagefactor_data[1] = 0x0066;
 		imagefactor_data[2] = 0x8168;
@@ -2299,7 +2326,7 @@ static int check_bin_version(const struct firmware *fw, int *tagLen, char *fw_ve
 		pr_info_if(8, "(INIT): tag=%s", tag);
 		if (strstr(tag, fw_ver) != NULL) {
 			pr_info_if(8, "(INIT): Update Bypass");
-			return 0; 
+			return 0; /* bypass */
 		}
 	}
 
@@ -2362,7 +2389,7 @@ static void check_fw_and_config(struct data *ts)
 		pr_info_if(8, "(INIT): firmware download OK");
 	}
 
-	
+	/* configure the chip */
 	if (PDATA(update_feature)&MAX1187X_UPDATE_CONFIG) {
 		while(ts->fw_config->config_id != 0) {
 			if(ts->fw_config->protocol_ver != ts->protocol_ver) {
@@ -2439,6 +2466,7 @@ static void check_fw_and_config(struct data *ts)
 	}
 }
 
+/* #ifdef CONFIG_OF */
 static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 {
 	struct max1187x_pdata *pdata = NULL;
@@ -2455,19 +2483,19 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 		return NULL;
 	}
 
-	
+	/* Parse gpio_tirq */
 	if (of_property_read_u32(devnode, "gpio_tirq", &pdata->gpio_tirq)) {
 		pr_err("Failed to get property: gpio_tirq\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse gpio_reset */
 	if (of_property_read_u32(devnode, "gpio_reset", &pdata->gpio_reset)) {
 		pr_err("Failed to get property: gpio_reset\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse num_fw_mappings */
 	if (of_property_read_u32(devnode, "num_fw_mappings",
 		&pdata->num_fw_mappings)) {
 		pr_err("Failed to get property: num_fw_mappings\n");
@@ -2477,7 +2505,7 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 	if (pdata->num_fw_mappings > MAX1187X_NUM_FW_MAPPINGS_MAX)
 		pdata->num_fw_mappings = MAX1187X_NUM_FW_MAPPINGS_MAX;
 
-	
+	/* Parse chip_id */
 	if (of_property_read_u32_array(devnode, "chip_id", datalist,
 			pdata->num_fw_mappings)) {
 		pr_err("Failed to get property: chip_id\n");
@@ -2487,7 +2515,7 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 	for (i = 0; i < pdata->num_fw_mappings; i++)
 		pdata->fw_mapping[i].chip_id = datalist[i];
 
-	
+	/* Parse filename */
 	for (i = 0; i < pdata->num_fw_mappings; i++) {
 		if (of_property_read_string_index(devnode, "filename", i,
 			(const char **) &pdata->fw_mapping[i].filename)) {
@@ -2497,7 +2525,7 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 			}
 	}
 
-	
+	/* Parse filesize */
 	if (of_property_read_u32_array(devnode, "filesize", datalist,
 		pdata->num_fw_mappings)) {
 		pr_err("Failed to get property: filesize\n");
@@ -2507,7 +2535,7 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 	for (i = 0; i < pdata->num_fw_mappings; i++)
 		pdata->fw_mapping[i].filesize = datalist[i];
 
-	
+	/* Parse file_codesize */
 	if (of_property_read_u32_array(devnode, "file_codesize", datalist,
 		pdata->num_fw_mappings)) {
 		pr_err("Failed to get property: file_codesize\n");
@@ -2517,116 +2545,116 @@ static struct max1187x_pdata *max1187x_get_platdata_dt(struct device *dev)
 	for (i = 0; i < pdata->num_fw_mappings; i++)
 		pdata->fw_mapping[i].file_codesize = datalist[i];
 
-	
+	/* Parse defaults_allow */
 	if (of_property_read_u32(devnode, "defaults_allow",
 		&pdata->defaults_allow)) {
 		pr_err("Failed to get property: defaults_allow\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse default_config_id */
 	if (of_property_read_u32(devnode, "default_config_id",
 		&pdata->default_config_id)) {
 		pr_err("Failed to get property: default_config_id\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse default_chip_id */
 	if (of_property_read_u32(devnode, "default_chip_id",
 		&pdata->default_chip_id)) {
 		pr_err("Failed to get property: default_chip_id\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse i2c_words */
 	if (of_property_read_u32(devnode, "i2c_words", &pdata->i2c_words)) {
 		pr_err("Failed to get property: i2c_words\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse coordinate_settings */
 	if (of_property_read_u32(devnode, "coordinate_settings",
 		&pdata->coordinate_settings)) {
 		pr_err("Failed to get property: coordinate_settings\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse panel_max_x */
 	if (of_property_read_u32(devnode, "panel_max_x",
 		&pdata->panel_max_x)) {
 		pr_err("Failed to get property: panel_max_x\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse panel_min_x */
 	if (of_property_read_u32(devnode, "panel_min_x",
 		&pdata->panel_min_x)) {
 		pr_err("Failed to get property: panel_min_x\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse panel_max_y */
 	if (of_property_read_u32(devnode, "panel_max_y",
 		&pdata->panel_max_y)) {
 		pr_err("Failed to get property: panel_max_y\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse panel_min_y */
 	if (of_property_read_u32(devnode, "panel_min_y",
 		&pdata->panel_min_y)) {
 		pr_err("Failed to get property: panel_min_y\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse lcd_x */
 	if (of_property_read_u32(devnode, "lcd_x", &pdata->lcd_x)) {
 		pr_err("Failed to get property: lcd_x\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse lcd_y */
 	if (of_property_read_u32(devnode, "lcd_y", &pdata->lcd_y)) {
 		pr_err("Failed to get property: lcd_y\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse row_count */
 	if (of_property_read_u32(devnode, "num_rows",
 		&pdata->num_rows)) {
 		pr_err("Failed to get property: num_rows\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse num_cols */
 	if (of_property_read_u32(devnode, "num_cols",
 		&pdata->num_cols)) {
 		pr_err("Failed to get property: num_cols\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse button_code0 */
 	if (of_property_read_u32(devnode, "button_code0",
 		&pdata->button_code0)) {
 		pr_err("Failed to get property: button_code0\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse button_code1 */
 	if (of_property_read_u32(devnode, "button_code1",
 		&pdata->button_code1)) {
 		pr_err("Failed to get property: button_code1\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse button_code2 */
 	if (of_property_read_u32(devnode, "button_code2",
 		&pdata->button_code2)) {
 		pr_err("Failed to get property: button_code2\n");
 		goto err_max1187x_get_platdata_dt;
 	}
 
-	
+	/* Parse button_code3 */
 	if (of_property_read_u32(devnode, "button_code3",
 		&pdata->button_code3)) {
 		pr_err("Failed to get property: button_code3\n");
@@ -2639,6 +2667,15 @@ err_max1187x_get_platdata_dt:
 	devm_kfree(dev, pdata);
 	return NULL;
 }
+/*
+#else
+static inline struct max1187x_pdata *
+	max1187x_get_platdata_dt(struct device *dev)
+{
+	return NULL;
+}
+#endif
+*/
 
 static int validate_pdata(struct max1187x_pdata *pdata)
 {
@@ -2719,9 +2756,15 @@ static int device_init(struct i2c_client *client)
 	init_state = 1;
 	dev_info(dev, "(INIT): Start");
 
-	
+	/* if I2C functionality is not present we are done */
+	/*if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+		pr_err("I2C core driver does not support I2C functionality");
+		ret = -ENXIO;
+		goto err_device_init;
+	}
+	pr_info_if(8, "(INIT): I2C functionality OK");*/
 
-	
+	/* allocate control block; nothing more to do if we can't */
 	ts = kzalloc(sizeof(*ts), GFP_KERNEL);
 	if (!ts) {
 		pr_err("Failed to allocate control block memory");
@@ -2729,7 +2772,7 @@ static int device_init(struct i2c_client *client)
 		goto err_device_init;
 	}
 
-	
+	/* Get platform data */
 #ifdef MAX1187X_LOCAL_PDATA
 	pdata = &local_pdata;
 	if (!pdata) {
@@ -2738,15 +2781,17 @@ static int device_init(struct i2c_client *client)
 		goto err_device_init_pdata;
 	}
 #else
-	
-	
+	/*pdata = dev_get_platdata(dev);*/
+	/* If pdata is missing, try to get pdata from device tree (dts) */
+	/*if (!pdata)
+		pdata = max1187x_get_platdata_dt(dev);*/
 
 	if (client->dev.of_node)
 		pdata = max1187x_get_platdata_dt(dev);
 	else
 		pdata = dev_get_platdata(dev);
 
-	
+	/* Validate if pdata values are okay */
 	ret = validate_pdata(pdata);
 	if (ret < 0)
 		goto err_device_init_pdata;
@@ -2782,14 +2827,14 @@ static int device_init(struct i2c_client *client)
 		pr_info_if(8, "(INIT): Debug level=0x%08X", debug_mask);
 	}
 
-	
+	/* Initialize GPIO pins */
 	if (max1187x_chip_init(ts->pdata, 1) < 0) {
 		ret = -EIO;
 		goto err_device_init_gpio;
 	}
 	pr_info_if(8, "(INIT): chip init OK");
 
-	
+	/* Setup IRQ and handler */
 	if (request_threaded_irq(client->irq, NULL, irq_handler,
 		IRQF_TRIGGER_FALLING | IRQF_ONESHOT, client->name, ts) != 0) {
 			pr_err("Failed to setup IRQ handler");
@@ -2798,11 +2843,11 @@ static int device_init(struct i2c_client *client)
 	}
 	pr_info_if(8, "(INIT): IRQ handler OK");
 
-	
-	
+	/* collect controller ID and configuration ID data from firmware   */
+	/* and perform firmware comparison/download if we have valid image */
 	check_fw_and_config(ts);
 
-	
+	/* allocate and register touch device */
 	ts->input_dev = input_allocate_device();
 	if (!ts->input_dev) {
 		pr_err("Failed to allocate touch input device");
@@ -2873,7 +2918,7 @@ static int device_init(struct i2c_client *client)
 		ts->height_offset = PDATA(panel_min_y);
 	}
 
-	
+	/* configure suspend/resume */
 	ts->early_suspend.level = EARLY_SUSPEND_LEVEL_STOP_DRAWING - 1;
 	ts->early_suspend.suspend = early_suspend;
 	ts->early_suspend.resume = late_resume;
@@ -2882,7 +2927,7 @@ static int device_init(struct i2c_client *client)
 	pr_info_if(8, "(INIT): suspend/resume registration OK");
 
 	gl_ts = ts;
-	
+	/* set up debug interface */
 	if (sysfs_create_file(android_touch_kobj, &dev_attr_debug_level.attr) < 0) {
 		pr_err("failed to create sysfs file [debug_level]");
 		return 0;
@@ -2980,7 +3025,7 @@ static int check_chip_exist(struct i2c_client *client)
 {
 	char buf[32];
 	int read_len = 0, i;
-	
+	/* if I2C functionality is not present we are done */
 	if(!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		pr_err("I2C core driver does not support I2C functionality");
 		return -1;
@@ -3068,6 +3113,9 @@ static int remove(struct i2c_client *client)
 	return ret;
 }
 
+/*
+ COMMANDS
+ */
 static int sreset(struct i2c_client *client)
 {
 	struct data *ts = i2c_get_clientdata(client);
@@ -3256,7 +3304,7 @@ static void late_resume(struct early_suspend *h)
 	ts = container_of(h, struct data, early_suspend);
 
 	pr_info("max1187x_%s", __func__);
-	
+	/* previous_fingers = current_fingers = 0; */
 	(void)send_mtp_command(ts, data, NWORDS(data));
 
 	(void)change_touch_rpt(ts->client, PDATA(report_mode));
@@ -3451,14 +3499,14 @@ static int bootloader_get_crc(struct data *ts, u16 *crc16,
 	}
 	msleep(delay);
 
-	
+	/* reads low 8bits (crcL) */
 	if (bootloader_rxtx(ts, &byteL, &byteH, 0) < 0) {
 		pr_err("Failed to read low byte of crc response!");
 		return -EIO;
 	}
 	rx_crc16 = (u16) byteL;
 
-	
+	/* reads high 8bits (crcH) */
 	if (bootloader_rxtx(ts, &byteL, &byteH, 0) < 0) {
 		pr_err("Failed to read high byte of crc response!");
 		return -EIO;
@@ -3500,7 +3548,7 @@ static int bootloader_erase_flash(struct data *ts)
 	}
 
 	for (i = 0; i < 10; i++) {
-		msleep(60); 
+		msleep(60); /* wait 60ms */
 
 		if (bootloader_get_cmd_conf(ts, 0) < 0)
 			continue;
@@ -3567,6 +3615,11 @@ static int bootloader_write_flash(struct data *ts, const u8 *image, u16 length)
 	return 0;
 }
 
+/****************************************
+ *
+ * Standard Driver Structures/Functions
+ *
+ ****************************************/
 static const struct i2c_device_id id[] = { { MAX1187X_NAME, 0 }, { } };
 
 MODULE_DEVICE_TABLE(i2c, id);

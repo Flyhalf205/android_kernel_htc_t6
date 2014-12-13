@@ -25,13 +25,13 @@
 #include "board-t6dug.h"
 #elif defined(CONFIG_MACH_T6_DWG)
 #include "board-t6dwg.h"
-#elif defined(CONFIG_MACH_DUMMY)
+#elif defined(CONFIG_MACH_T6_UL)
 #include "board-t6ul.h"
 #elif defined(CONFIG_MACH_T6_WL)
 #include "board-t6wl.h"
-#elif defined(CONFIG_MACH_DUMMY)
+#elif defined(CONFIG_MACH_T6_WHL)
 #include "board-t6whl.h"
-#elif defined(CONFIG_MACH_DUMMY)
+#elif defined(CONFIG_MACH_T6_UHL)
 #include "board-t6uhl.h"
 #endif
 
@@ -57,31 +57,31 @@
 #define CAM_PIN_GPIO_RAW_RSTN	RAW_RST
 #define CAM_PIN_GPIO_RAW_INTR0	RAW_INT0
 #define CAM_PIN_GPIO_RAW_INTR1	RAW_INT1
-#define CAM_PIN_GPIO_CAM_MCLK0	CAM_MCLK0	
-#define CAM_PIN_GPIO_CAM_MCLK1	CAM_MCLK1	
+#define CAM_PIN_GPIO_CAM_MCLK0	CAM_MCLK0	/*CAMIF_MCLK*/
+#define CAM_PIN_GPIO_CAM_MCLK1	CAM_MCLK1	/*CAMIF_MCLK*/
 
 
-#define CAM_PIN_GPIO_CAM_I2C_DAT	CAM_I2C_SDA	 
-#define CAM_PIN_GPIO_CAM_I2C_CLK	CAM_I2C_SCL	
+#define CAM_PIN_GPIO_CAM_I2C_DAT	CAM_I2C_SDA	/*CAMIF_I2C_DATA*/ 
+#define CAM_PIN_GPIO_CAM_I2C_CLK	CAM_I2C_SCL	/*CAMIF_I2C_CLK*/
 
 #define CAM_PIN_GPIO_FRONT_CAM_I2C_DAT	SR_I2C_SDA
 #define CAM_PIN_GPIO_FRONT_CAM_I2C_CLK	SR_I2C_SCL
 
-#define CAM_PIN_GPIO_MCAM_SPI_CLK	MCAM_FP_SPI_CLK
+#define CAM_PIN_GPIO_MCAM_SPI_CLK	MCAM_FP_SPI_CLK//MCAM_SPI_CLK
 #define CAM_PIN_GPIO_MCAM_SPI_CS0	MCAM_SPI_CS0
 #define CAM_PIN_GPIO_MCAM_SPI_DI	MCAM_FP_SPI_DI
 #define CAM_PIN_GPIO_MCAM_SPI_DO	MCAM_FP_SPI_DO
 #define CAM_PIN_GPIO_CAM_PWDN	PM8921_GPIO_PM_TO_SYS(CAM_PWDN)
-#define CAM_PIN_GPIO_CAM_VCM_PD	PM8921_GPIO_PM_TO_SYS(CAM_VCM_PD)	
+#define CAM_PIN_GPIO_CAM_VCM_PD	PM8921_GPIO_PM_TO_SYS(CAM_VCM_PD)	//AP2MDM_PON_RESET_N	GPIO(59)
 #define CAM_PIN_GPIO_CAM2_RSTz	CAM2_RSTz
 
 #define CAM_PIN_MAIN_CAMERA_ID PM8921_GPIO_PM_TO_SYS(MAIN_CAM_ID)
 #define CAM_PIN_FRONT_CAMERA_ID PM8921_GPIO_PM_TO_SYS(CAM2_ID)
 
-#define MSM_8960_GSBI4_QUP_I2C_BUS_ID 4	
+#define MSM_8960_GSBI4_QUP_I2C_BUS_ID 4	//board-8960.h
 
 extern unsigned int system_rev;
-extern unsigned int engineerid; 
+extern unsigned int engineerid; // bit 0
 
 
 int gpio_get(int gpio, int* value)
@@ -117,157 +117,157 @@ int gpio_set(int gpio,int enable)
 
 static struct gpiomux_setting cam_settings[] = {
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*suspend - I(L) 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /*active 1 - A FUNC1 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 2 - O(L) 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_LOW,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /*active 3 - A FUNC1 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_2, 
+		.func = GPIOMUX_FUNC_2, /*active 4 - A FUNC2 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 5 - I(L) 4MA*/
 		.drv = GPIOMUX_DRV_4MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_2, 
+		.func = GPIOMUX_FUNC_2, /*active 6 - A FUNC2 2MA*/
 		.drv = GPIOMUX_DRV_2MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 7 - I(NP) 2MA*/
 		.drv = GPIOMUX_DRV_2MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 8 - I(L) 2MA*/
 		.drv = GPIOMUX_DRV_2MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 9 - O(H) 2MA*/
 		.drv = GPIOMUX_DRV_2MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_HIGH,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /*active 10 - O(L) 2MA*/
 		.drv = GPIOMUX_DRV_2MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_LOW,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /*active 11 - suspend - I(L) 8MA*/
 		.drv = GPIOMUX_DRV_8MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /* 12 - O(L) 4MA*/
 		.drv = GPIOMUX_DRV_4MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_LOW,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /* 13 - O(H) 4MA*/
 		.drv = GPIOMUX_DRV_4MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_HIGH,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /* 14 - O(L) 6MA*/
 		.drv = GPIOMUX_DRV_6MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_LOW,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /* 15 - O(H) 6MA*/
 		.drv = GPIOMUX_DRV_6MA,
 		.pull = GPIOMUX_PULL_NONE,
 		.dir = GPIOMUX_OUT_HIGH,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /* 16 - I(PD) 6MA*/
 		.drv = GPIOMUX_DRV_6MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /* 17 - A FUNC1 6MA*/
 		.drv = GPIOMUX_DRV_6MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 #if defined(CONFIG_MACH_T6_TL) || defined(CONFIG_MACH_T6_DWG) || defined(CONFIG_MACH_T6_DUG)
 	{
-		.func = GPIOMUX_FUNC_2, 
+		.func = GPIOMUX_FUNC_2, /* 18 - A FUNC2 6MA*/
 		.drv = GPIOMUX_DRV_16MA,
-		
+		/*.drv = GPIOMUX_DRV_6MA,*/
 		.pull = GPIOMUX_PULL_NONE,
 	},
 #else
 	{
-		.func = GPIOMUX_FUNC_2, 
+		.func = GPIOMUX_FUNC_2, /* 18 - A FUNC2 6MA*/
 		.drv = GPIOMUX_DRV_10MA,
-		
+		/*.drv = GPIOMUX_DRV_6MA,*/
 		.pull = GPIOMUX_PULL_NONE,
 	},
 #endif
 
 	{
-		.func = GPIOMUX_FUNC_GPIO, 
+		.func = GPIOMUX_FUNC_GPIO, /* 19 - I(L) 6MA*/
 		.drv = GPIOMUX_DRV_6MA,
 		.pull = GPIOMUX_PULL_DOWN,
 		.dir = GPIOMUX_IN,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_1, 
+		.func = GPIOMUX_FUNC_1, /* 20 - A FUNC1 4MA*/
 		.drv = GPIOMUX_DRV_4MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
 
 	{
-		.func = GPIOMUX_FUNC_2, 
+		.func = GPIOMUX_FUNC_2, /* 21 - A FUNC2 4MA*/
 		.drv = GPIOMUX_DRV_4MA,
 		.pull = GPIOMUX_PULL_NONE,
 	},
@@ -277,87 +277,87 @@ static struct msm_gpiomux_config t6china_cam_common_configs[] = {
 	{
 		.gpio = CAM_PIN_GPIO_CAM_MCLK0,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[20], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[14], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[20], /*A FUNC1 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[14], /*O(L) 6MA*/
 		},
 	},
 	{
 		.gpio = CAM_PIN_GPIO_CAM_MCLK1,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[21], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[14], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[21], /*A FUNC2 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[14], /*O(L) 6MA*/
 		},
 	},
 	
 	{
 		.gpio = CAM_PIN_GPIO_CAM_I2C_DAT,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[17], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[17], /*A FUNC1 6MA*/
 			[GPIOMUX_SUSPENDED] = &cam_settings[19],
 		},
 	},
 	{
 		.gpio = CAM_PIN_GPIO_CAM_I2C_CLK,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[17], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[17], /*A FUNC1 6MA*/
 			[GPIOMUX_SUSPENDED] = &cam_settings[19],
 		},
 	},
     {
         .gpio = CAM_PIN_GPIO_FRONT_CAM_I2C_DAT,
         .settings = {
-            [GPIOMUX_ACTIVE]    = &cam_settings[17], 
+            [GPIOMUX_ACTIVE]    = &cam_settings[17], /*A FUNC1 6MA*/
             [GPIOMUX_SUSPENDED] = &cam_settings[17],
         },
     },
     {
         .gpio = CAM_PIN_GPIO_FRONT_CAM_I2C_CLK,
         .settings = {
-            [GPIOMUX_ACTIVE]    = &cam_settings[17], 
+            [GPIOMUX_ACTIVE]    = &cam_settings[17], /*A FUNC1 6MA*/
             [GPIOMUX_SUSPENDED] = &cam_settings[17],
         },
     },
 	{
 		.gpio = CAM_PIN_GPIO_RAW_INTR0,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[7], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[8], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[7], /*I(NP) 2MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[8], /*I(L) 2MA*/
 		},
 	},
 	{
 		.gpio = CAM_PIN_GPIO_RAW_INTR1,
 		.settings = {
-			[GPIOMUX_ACTIVE]    = &cam_settings[7], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[8], 
+			[GPIOMUX_ACTIVE]    = &cam_settings[7], /*I(NP) 2MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[8], /*I(L) 2MA*/
 		},
 	},
-	
+	/* gpio config for Rawchip SPI - gsbi10 */
 	{
 		.gpio      = CAM_PIN_GPIO_MCAM_SPI_CLK,
 		.settings = {
-			[GPIOMUX_ACTIVE] = &cam_settings[18], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[18], 
+			[GPIOMUX_ACTIVE] = &cam_settings[18], /*A FUNC2 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[18], /*I(PD)  6MA*/
 		},
 	},
 	{
 		.gpio      = CAM_PIN_GPIO_MCAM_SPI_CS0,
 		.settings = {
-			[GPIOMUX_ACTIVE] = &cam_settings[18], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[19], 
+			[GPIOMUX_ACTIVE] = &cam_settings[18], /*A FUNC2 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[19], /* I(PD)  6MA*/
 		},
 	},
 	{
 		.gpio      = CAM_PIN_GPIO_MCAM_SPI_DI,
 		.settings = {
-			[GPIOMUX_ACTIVE] = &cam_settings[18], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[18], 
+			[GPIOMUX_ACTIVE] = &cam_settings[18], /*A FUNC2 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[18], /* I(PD) 6MA*/
 		},
 	},
 	{
 		.gpio      = CAM_PIN_GPIO_MCAM_SPI_DO,
 		.settings = {
-			[GPIOMUX_ACTIVE] = &cam_settings[18], 
-			[GPIOMUX_SUSPENDED] = &cam_settings[18], 
+			[GPIOMUX_ACTIVE] = &cam_settings[18], /*A FUNC2 6MA*/
+			[GPIOMUX_SUSPENDED] = &cam_settings[18], /*I(PD) 6MA*/
 		},
 	},
 };
@@ -431,8 +431,8 @@ static struct msm_bus_vectors cam_snapshot_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_VFE,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
-		.ab  = 700000000, 
-		.ib  = 3749488640U, 
+		.ab  = 700000000, /* 468686080, */
+		.ib  = 3749488640U, /* 1874744320, */
 	},
 	{
 		.src = MSM_BUS_MASTER_VPE,
@@ -443,7 +443,7 @@ static struct msm_bus_vectors cam_snapshot_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_JPEG_ENC,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
-		.ab  = 200000000, 
+		.ab  = 200000000, /* 540518400, */
 		.ib  = 1351296000,
 	},
 };
@@ -452,8 +452,8 @@ static struct msm_bus_vectors cam_zsl_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_VFE,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
-		.ab  = 700000000, 
-		.ib  = 3749488640U, 
+		.ab  = 700000000, /* 468686080, */
+		.ib  = 3749488640U, /* 1874744320, */
 	},
 	{
 		.src = MSM_BUS_MASTER_VPE,
@@ -464,7 +464,7 @@ static struct msm_bus_vectors cam_zsl_vectors[] = {
 	{
 		.src = MSM_BUS_MASTER_JPEG_ENC,
 		.dst = MSM_BUS_SLAVE_EBI_CH0,
-		.ab  = 200000000, 
+		.ab  = 200000000, /* 540518400, */
 		.ib  = 1351296000,
 	},
 };
@@ -623,6 +623,7 @@ static int t6china_front_camera_on=0;
 static int t6chian_csi_on=0;
 static int t6chian_camera_on=0;
 
+//static
 int t6china_camera_vreg_on(void)
 {
     int rc=0;
@@ -634,25 +635,25 @@ int t6china_camera_vreg_on(void)
         return rc;
     }
 
-	
+	// 2nd digital 1.8v
 	rc = camera_sensor_power_enable("8921_l22", 3000000, &reg_8921_l22);
     if (rc<0)
         goto VREG_FAIL_D1V8;
     mdelay(125);
 
-    
+    // main/2nd io 1.8v
 	rc = camera_sensor_power_enable("8921_l23", 1800000, &reg_8921_l23);
     if (rc<0)
         goto VREG_FAIL_IO1V8;
 	mdelay(25);
 
-    
+    // main/2nd analog 2.8v
 	rc = camera_sensor_power_enable("8921_l8", 2800000, &reg_8921_l8);
     if (rc<0)
         goto VREG_FAIL_ANALOG2V8;
 	mdelay(10);
 
-    
+    // main digital 1.2v
     rc = gpio_set (PM8921_GPIO_PM_TO_SYS(MCAM_D1V2_EN),1);
     if (rc<0)
         goto VREG_FAIL_1V2;
@@ -675,6 +676,7 @@ VREG_FAIL_D1V8:
 }
 
 
+//static
 int t6china_camera_vreg_off(void)
 {
     pr_info("%s\n", __func__);    
@@ -686,11 +688,11 @@ int t6china_camera_vreg_off(void)
     }
 
     gpio_set (PM8921_GPIO_PM_TO_SYS(MCAM_D1V2_EN),0);
-    camera_sensor_power_disable(reg_8921_l8); 
+    camera_sensor_power_disable(reg_8921_l8); // main/2nd analog 2.8v
 	mdelay(25);
-    camera_sensor_power_disable(reg_8921_l23); 
+    camera_sensor_power_disable(reg_8921_l23); // main/2nd io 1.8v
 	mdelay(125);
-    camera_sensor_power_disable(reg_8921_l22); 
+    camera_sensor_power_disable(reg_8921_l22); // 2nd digital 1.8v
 
     return 0;
 }
@@ -703,19 +705,19 @@ int t6china_main_camera_vreg_on(void)
     pr_info ("%s: t6china_main_camera_on=%d\n",__func__,t6china_main_camera_on);
 
     if (t6china_main_camera_on==1) {
-        
+        // vcm power
         rc = camera_sensor_power_enable("8921_l29", 2850000, &reg_8921_l29);
         if (rc<0)
             goto FAIL_VCM_POWER;
 
-        
+        // vcm pd
         rc = gpio_set (PM8921_GPIO_PM_TO_SYS(CAM_VCM_PD),1);
         if (rc<0)
             goto FAIL_VCM_PD;
     }
     rc = t6china_camera_vreg_on();
 
-    
+    // 2nd camera to suspend mode if it never turned on
     if (!t6china_front_camera_on) {
         pr_info("%s: front camera enter suspend mode\n",__func__);
         gpio_set(CAM_PIN_GPIO_CAM2_RSTz,0);
@@ -724,7 +726,7 @@ int t6china_main_camera_vreg_on(void)
     if (t6china_main_camera_on==1) {
         pr_info ("%s: main camera exit suspend mode\n",__func__);
         gpio_set(CAM_PIN_GPIO_CAM_PWDN,1);
-        
+        // main cam digital
         gpio_set (PM8921_GPIO_PM_TO_SYS(MCAM_D1V2_EN),1);
     }
     return rc;
@@ -743,7 +745,7 @@ int t6china_main_camera_vreg_off(void)
         t6china_main_camera_on--;
 
     if (t6china_main_camera_on==0) {
-        
+        // vcm power/reset
         camera_sensor_power_disable(reg_8921_l29);
         gpio_set (PM8921_GPIO_PM_TO_SYS(CAM_VCM_PD),0);
         gpio_set (CAM_PIN_GPIO_CAM_PWDN,0);
@@ -762,7 +764,7 @@ static int t6china_front_camera_vreg_on(void)
     if (!t6china_main_camera_on) {
         pr_info ("%s: main camera enter suspend mode\n",__func__);
         gpio_set(CAM_PIN_GPIO_CAM_PWDN,0);
-        
+        // main cam digital
         gpio_set (PM8921_GPIO_PM_TO_SYS(MCAM_D1V2_EN),0);
     }
     if (t6china_front_camera_on==1) {
@@ -796,7 +798,7 @@ static int t6china_rawchip_vreg_on(void)
     int rc = 0;
     pr_info("%s\n", __func__);
 
-    
+    // 1.8v
     rc = camera_sensor_power_enable("8921_lvs4", 1800000, &reg_8921_lvs4);
     if (rc < 0) {
         pr_err("sensor_power_enable(\"8921_lvs4\") FAILED %d\n", rc);
@@ -804,7 +806,7 @@ static int t6china_rawchip_vreg_on(void)
     }
     mdelay(5);
     
-    
+    // 1.2v & 1.15v
     rc = gpio_set (PM8921_GPIO_PM_TO_SYS(V_RAW_1V2_EN),1);
     if (rc<0)
         goto RAW_FAIL_1V2;
@@ -836,8 +838,8 @@ static struct msm_camera_rawchip_info t6china_msm_rawchip_board_info = {
 	.rawchip_reset	= CAM_PIN_GPIO_RAW_RSTN,
 	.rawchip_intr0	= MSM_GPIO_TO_INT(CAM_PIN_GPIO_RAW_INTR0),
 	.rawchip_intr1	= MSM_GPIO_TO_INT(CAM_PIN_GPIO_RAW_INTR1),
-	.rawchip_spi_freq = 27, 
-	.rawchip_mclk_freq = 24, 
+	.rawchip_spi_freq = 27, /* MHz, should be the same to spi max_speed_hz */
+	.rawchip_mclk_freq = 24, /* MHz, should be the same as cam csi0 mclk_clk_rate */
 	.camera_rawchip_power_on = t6china_rawchip_vreg_on,
 	.camera_rawchip_power_off = t6china_rawchip_vreg_off,
 	.rawchip_use_ext_1v2 = t6china_use_ext_1v2,
@@ -857,7 +859,7 @@ struct platform_device t6china_msm_rawchip_device = {
 
 #ifdef CONFIG_VD6869
 static uint16_t vd6869_back_cam_gpio[] = {
-	CAM_PIN_GPIO_CAM_MCLK0, 
+	CAM_PIN_GPIO_CAM_MCLK0, /*CAMIF_MCLK*/
 	CAM_PIN_GPIO_MCAM_SPI_CLK,
 	CAM_PIN_GPIO_MCAM_SPI_CS0,
 	CAM_PIN_GPIO_MCAM_SPI_DI,
@@ -869,7 +871,7 @@ static uint16_t vd6869_back_cam_gpio[] = {
 
 #ifdef CONFIG_OV4688
 static uint16_t ov4688_back_cam_gpio[] = {
-	CAM_PIN_GPIO_CAM_MCLK0, 
+	CAM_PIN_GPIO_CAM_MCLK0, /*CAMIF_MCLK*/
 	CAM_PIN_GPIO_MCAM_SPI_CLK,
 	CAM_PIN_GPIO_MCAM_SPI_CS0,
 	CAM_PIN_GPIO_MCAM_SPI_DI,
@@ -911,13 +913,14 @@ static struct i2c_board_info lc898212_actuator_i2c_info = {
 
 static struct msm_actuator_info lc898212_actuator_info = {
 	.board_info     = &lc898212_actuator_i2c_info,
-	.cam_name       = MSM_ACTUATOR_MAIN_CAM_1, 
+	.cam_name       = MSM_ACTUATOR_MAIN_CAM_1, // HTC - set ACTUATOR_MAIN_CAM_1 for closeloop af config
 	.bus_id         = MSM_8960_GSBI4_QUP_I2C_BUS_ID,
 	.vcm_pwd        = CAM_PIN_GPIO_CAM_VCM_PD,
 	.vcm_enable     = 1,
 };
 #endif
 
+/* HTC_END */
 
 #ifdef CONFIG_VD6869
 
@@ -943,7 +946,7 @@ static struct msm_camera_csi_lane_params vd6869_csi_lane_params = {
 
 static struct msm_camera_sensor_platform_info sensor_vd6869_board_info = {
 	.mount_angle = 90,
-	.pixel_order_default = MSM_CAMERA_PIXEL_ORDER_GR,	
+	.pixel_order_default = MSM_CAMERA_PIXEL_ORDER_GR,	/* HTC_START steven pixel order select from board info 20121204 */
 	.mirror_flip = CAMERA_SENSOR_NONE,
 	.board_control_reset_pin = 1,
 	.sensor_reset_enable = 1,
@@ -955,53 +958,85 @@ static struct msm_camera_sensor_platform_info sensor_vd6869_board_info = {
 	.sensor_mount_angle = ANGLE_90,
 };
 
+/* Andrew_Cheng linear led 20111205 MB */
+//150 mA FL_MODE_FLASH_LEVEL1
+//200 mA FL_MODE_FLASH_LEVEL2
+//300 mA FL_MODE_FLASH_LEVEL3
+//400 mA FL_MODE_FLASH_LEVEL4
+//500 mA FL_MODE_FLASH_LEVEL5
+//600 mA FL_MODE_FLASH_LEVEL6
+//700 mA FL_MODE_FLASH_LEVEL7
 static struct camera_led_est msm_camera_sensor_vd6869_led_table[] = {
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL1,
+//             .current_ma = 150,
+//             .lumen_value = 150,
+//             .min_step = 50,
+//             .max_step = 70
+//     },
                 {
                 .enable = 1,
                 .led_state = FL_MODE_FLASH,
-                .current_ma = 1500,
-                .lumen_value = 1500,
-                .min_step = 9,
+                .current_ma = 1500,//200,
+                .lumen_value = 1500,//250,//245,//240,   //mk0118
+                .min_step = 9,//23,  //mk0210
                 .max_step = 28
         },
                 {
-                .enable = 1,
+                .enable = 1,//1,
                 .led_state = FL_MODE_FLASH_LEVEL3,
-                .current_ma = 300,
-                .lumen_value = 300,
+                .current_ma = 300,//300,
+                .lumen_value = 300,//350,
                 .min_step = 0,
                 .max_step = 8
         },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH_LEVEL4,
-                .current_ma = 800,
-                .lumen_value = 880,
+                .current_ma = 800,//400,
+                .lumen_value = 880,//440,
                 .min_step = 25,
                 .max_step = 26
         },
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL5,
+//             .current_ma = 500,
+//             .lumen_value = 500,
+//             .min_step = 23,//25,
+//             .max_step = 29//26,
+//     },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH_LEVEL6,
-                .current_ma = 1200,
-                .lumen_value = 1250,
+                .current_ma = 1200,//600,
+                .lumen_value = 1250,//625,
                 .min_step = 23,
                 .max_step = 24
         },
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL7,
+//             .current_ma = 700,
+//             .lumen_value = 700,
+//             .min_step = 21,
+//             .max_step = 22
+//     },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH,
-                .current_ma = 1500,
-                .lumen_value = 1450,
+                .current_ma = 1500,//750,
+                .lumen_value = 1450,//725,   //mk0217  //mk0221
                 .min_step = 0,
-                .max_step = 22    
+                .max_step = 22    //mk0210
         },
 
                 {
-                .enable =0,
+                .enable =0,// 2,
                 .led_state = FL_MODE_FLASH_LEVEL2,
                 .current_ma = 200,
-                .lumen_value = 250,
+                .lumen_value = 250,//245,
                 .min_step = 0,
                 .max_step = 270
         },
@@ -1022,12 +1057,12 @@ static struct camera_led_est msm_camera_sensor_vd6869_led_table[] = {
                 .max_step = 0
         },
         {
-                .enable = 0,
+                .enable = 0,//2,     //mk0210
                 .led_state = FL_MODE_FLASH,
                 .current_ma = 1500,
-                .lumen_value = 1450,
+                .lumen_value = 1450,//725,   //mk0217   //mk0221
                 .min_step = 271,
-                .max_step = 317    
+                .max_step = 317    //mk0210
         },
         {
                 .enable = 0,
@@ -1038,10 +1073,10 @@ static struct camera_led_est msm_camera_sensor_vd6869_led_table[] = {
                 .max_step = 26
         },
                 {
-                .enable = 0,
+                .enable = 0,//3,  //mk0210
                 .led_state = FL_MODE_FLASH,
                 .current_ma = 750,
-                .lumen_value = 750,
+                .lumen_value = 750,//740,//725,
                 .min_step = 271,
                 .max_step = 325
         },
@@ -1058,7 +1093,7 @@ static struct camera_led_est msm_camera_sensor_vd6869_led_table[] = {
 static struct camera_led_info msm_camera_sensor_vd6869_led_info = {
 	.enable = 1,
 	.low_limit_led_state = FL_MODE_TORCH,
-	.max_led_current_ma = 1500,  
+	.max_led_current_ma = 1500,  //mk0210
 	.num_led_est_table = ARRAY_SIZE(msm_camera_sensor_vd6869_led_table),
 };
 
@@ -1073,6 +1108,7 @@ static struct camera_flash_cfg msm_camera_sensor_vd6869_flash_cfg = {
 	.low_cap_limit_dual = 0,
 	.flash_info             = &msm_camera_sensor_vd6869_flash_info,
 };
+/* Andrew_Cheng linear led 20111205 ME */
 
 static struct msm_camera_sensor_flash_data flash_vd6869 = {
 	.flash_type	= MSM_CAMERA_FLASH_LED,
@@ -1100,11 +1136,11 @@ static struct msm_camera_sensor_info msm_camera_sensor_vd6869_data = {
 	.htc_image = HTC_CAMERA_IMAGE_YUSHANII_BOARD,
 	.hdr_mode = NON_HDR_MODE,
 	.video_hdr_capability = HDR_MODE,
-	.flash_cfg = &msm_camera_sensor_vd6869_flash_cfg, 
+	.flash_cfg = &msm_camera_sensor_vd6869_flash_cfg, /* Andrew_Cheng linear led 20111205 */
 	.dual_camera = 1,
 };
 
-#endif	
+#endif	//CONFIG_VD6869
 
 
 #ifdef CONFIG_AR0260
@@ -1170,7 +1206,7 @@ static struct msm_camera_sensor_info msm_camera_sensor_ar0260_data = {
 	.video_hdr_capability = NON_HDR_MODE,
 };
 
-#endif	
+#endif	//CONFIG_AR0260
 
 #ifdef CONFIG_AS0260
 
@@ -1236,7 +1272,7 @@ static struct msm_camera_sensor_info msm_camera_sensor_as0260_data = {
 	.dual_camera = 1,
 };
 
-#endif	
+#endif	//CONFIG_AS0260
 
 #ifdef CONFIG_OV4688
 
@@ -1262,7 +1298,7 @@ static struct msm_camera_csi_lane_params ov4688_csi_lane_params = {
 
 static struct msm_camera_sensor_platform_info sensor_ov4688_board_info = {
 	.mount_angle = 90,
-	.pixel_order_default = MSM_CAMERA_PIXEL_ORDER_GR,	
+	.pixel_order_default = MSM_CAMERA_PIXEL_ORDER_GR,	/* HTC_START steven pixel order select from board info 20121204 */
 	.mirror_flip = CAMERA_SENSOR_MIRROR,
 	.board_control_reset_pin = 1,
 	.sensor_reset_enable = 1,
@@ -1274,53 +1310,85 @@ static struct msm_camera_sensor_platform_info sensor_ov4688_board_info = {
 	.sensor_mount_angle = ANGLE_90,
 };
 
+/* Andrew_Cheng linear led 20111205 MB */
+//150 mA FL_MODE_FLASH_LEVEL1
+//200 mA FL_MODE_FLASH_LEVEL2
+//300 mA FL_MODE_FLASH_LEVEL3
+//400 mA FL_MODE_FLASH_LEVEL4
+//500 mA FL_MODE_FLASH_LEVEL5
+//600 mA FL_MODE_FLASH_LEVEL6
+//700 mA FL_MODE_FLASH_LEVEL7
 static struct camera_led_est msm_camera_sensor_ov4688_led_table[] = {
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL1,
+//             .current_ma = 150,
+//             .lumen_value = 150,
+//             .min_step = 50,
+//             .max_step = 70
+//     },
                 {
                 .enable = 1,
                 .led_state = FL_MODE_FLASH,
-                .current_ma = 1500,
-                .lumen_value = 1500,
-                .min_step = 9,
+                .current_ma = 1500,//200,
+                .lumen_value = 1500,//250,//245,//240,   //mk0118
+                .min_step = 9,//23,  //mk0210
                 .max_step = 28
         },
                 {
-                .enable = 1,
+                .enable = 1,//1,
                 .led_state = FL_MODE_FLASH_LEVEL3,
-                .current_ma = 300,
-                .lumen_value = 300,
+                .current_ma = 300,//300,
+                .lumen_value = 300,//350,
                 .min_step = 0,
                 .max_step = 8
         },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH_LEVEL4,
-                .current_ma = 800,
-                .lumen_value = 880,
+                .current_ma = 800,//400,
+                .lumen_value = 880,//440,
                 .min_step = 25,
                 .max_step = 26
         },
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL5,
+//             .current_ma = 500,
+//             .lumen_value = 500,
+//             .min_step = 23,//25,
+//             .max_step = 29//26,
+//     },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH_LEVEL6,
-                .current_ma = 1200,
-                .lumen_value = 1250,
+                .current_ma = 1200,//600,
+                .lumen_value = 1250,//625,
                 .min_step = 23,
                 .max_step = 24
         },
+//             {
+//             .enable = 0,
+//             .led_state = FL_MODE_FLASH_LEVEL7,
+//             .current_ma = 700,
+//             .lumen_value = 700,
+//             .min_step = 21,
+//             .max_step = 22
+//     },
                 {
-                .enable = 0,
+                .enable = 0,//1,
                 .led_state = FL_MODE_FLASH,
-                .current_ma = 1500,
-                .lumen_value = 1450,
+                .current_ma = 1500,//750,
+                .lumen_value = 1450,//725,   //mk0217  //mk0221
                 .min_step = 0,
-                .max_step = 22    
+                .max_step = 22    //mk0210
         },
 
                 {
-                .enable =0,
+                .enable =0,// 2,
                 .led_state = FL_MODE_FLASH_LEVEL2,
                 .current_ma = 200,
-                .lumen_value = 250,
+                .lumen_value = 250,//245,
                 .min_step = 0,
                 .max_step = 270
         },
@@ -1341,12 +1409,12 @@ static struct camera_led_est msm_camera_sensor_ov4688_led_table[] = {
                 .max_step = 0
         },
         {
-                .enable = 0,
+                .enable = 0,//2,     //mk0210
                 .led_state = FL_MODE_FLASH,
                 .current_ma = 1500,
-                .lumen_value = 1450,
+                .lumen_value = 1450,//725,   //mk0217   //mk0221
                 .min_step = 271,
-                .max_step = 317    
+                .max_step = 317    //mk0210
         },
         {
                 .enable = 0,
@@ -1357,10 +1425,10 @@ static struct camera_led_est msm_camera_sensor_ov4688_led_table[] = {
                 .max_step = 26
         },
                 {
-                .enable = 0,
+                .enable = 0,//3,  //mk0210
                 .led_state = FL_MODE_FLASH,
                 .current_ma = 750,
-                .lumen_value = 750,
+                .lumen_value = 750,//740,//725,
                 .min_step = 271,
                 .max_step = 325
         },
@@ -1378,7 +1446,7 @@ static struct camera_led_est msm_camera_sensor_ov4688_led_table[] = {
 static struct camera_led_info msm_camera_sensor_ov4688_led_info = {
         .enable = 1,
         .low_limit_led_state = FL_MODE_TORCH,
-        .max_led_current_ma = 1500,  
+        .max_led_current_ma = 1500,  //mk0210
         .num_led_est_table = ARRAY_SIZE(msm_camera_sensor_ov4688_led_table),
 };
 
@@ -1394,6 +1462,7 @@ static struct camera_flash_cfg msm_camera_sensor_ov4688_flash_cfg = {
 	.low_cap_limit_dual = 0,
 	.flash_info             = &msm_camera_sensor_ov4688_flash_info,
 };
+/* Andrew_Cheng linear led 20111205 ME */
 
 static struct msm_camera_sensor_flash_data flash_ov4688 = {
 	.flash_type	= MSM_CAMERA_FLASH_LED,
@@ -1425,7 +1494,7 @@ static struct msm_camera_sensor_info msm_camera_sensor_ov4688_data = {
 	.dual_camera = 1,
 };
 
-#endif
+#endif//end ov4688
 
 static struct platform_device msm_camera_server = {
 	.name = "msm_cam_server",
@@ -1476,7 +1545,7 @@ int main_camera_id(int* id)
 {
     int rc=0;
 
-    
+    // io 1.8v
 	rc = camera_sensor_power_enable("8921_l22", 3000000, &reg_8921_l22);
     if (rc<0) {
         goto CLEANUP;
@@ -1547,7 +1616,7 @@ void __init t6china_init_cam(void)
 #endif
 }
 
-#endif	
+#endif	//CONFIG_MSM_CAMERA
 
 
 

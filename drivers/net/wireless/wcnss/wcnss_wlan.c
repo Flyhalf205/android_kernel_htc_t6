@@ -33,6 +33,7 @@
 #define VERSION "1.01"
 #define WCNSS_PIL_DEVICE "wcnss"
 
+/* module params */
 #define WCNSS_CONFIG_UNSPECIFIED (-1)
 static int has_48mhz_xo = WCNSS_CONFIG_UNSPECIFIED;
 module_param(has_48mhz_xo, int, S_IWUSR | S_IRUGO);
@@ -110,6 +111,7 @@ static ssize_t wcnss_thermal_mitigation_store(struct device *dev,
 
 static DEVICE_ATTR(thermal_mitigation, S_IRUSR | S_IWUSR,
 	wcnss_thermal_mitigation_show, wcnss_thermal_mitigation_store);
+/* interface to reset Riva by sending the reset interrupt */
 void wcnss_reset_intr(void)
 {
 	pr_info("%s: reset interrupt RIVA\n", __func__);
@@ -149,7 +151,7 @@ static void wcnss_post_bootup(struct work_struct *work)
 {
 	pr_info("[WCNSS]%s: Cancel APPS vote for Iris & Riva\n", __func__);
 
-	
+	/* Since Riva is up, cancel any APPS vote for Iris & Riva VREGs  */
 	wcnss_wlan_power(&penv->pdev->dev, &penv->wlan_config,
 		WCNSS_WLAN_SWITCH_OFF);
 }
@@ -189,7 +191,7 @@ wcnss_wlan_ctrl_probe(struct platform_device *pdev)
 
 	pr_info("[WCNSS]%s: SMD ctrl channel up\n", __func__);
 
-	
+	/* Schedule a work to do any post boot up activity */
 	INIT_DELAYED_WORK(&penv->wcnss_work, wcnss_post_bootup);
 	schedule_delayed_work(&penv->wcnss_work, msecs_to_jiffies(10000));
 
@@ -344,12 +346,12 @@ wcnss_trigger_config(struct platform_device *pdev)
 	int ret;
 	struct qcom_wcnss_opts *pdata;
 
-	
+	/* make sure we are only triggered once */
 	if (penv->triggered)
 		return 0;
 	penv->triggered = 1;
 
-	
+	/* initialize the WCNSS device configuration */
 	pdata = pdev->dev.platform_data;
 	if (WCNSS_CONFIG_UNSPECIFIED == has_48mhz_xo)
 		has_48mhz_xo = pdata->has_48mhz_xo;
@@ -360,21 +362,21 @@ wcnss_trigger_config(struct platform_device *pdev)
 	penv->gpios_5wire = platform_get_resource_byname(pdev, IORESOURCE_IO,
 							"wcnss_gpios_5wire");
 
-	
+	/* allocate 5-wire GPIO resources */
 	if (!penv->gpios_5wire) {
 		dev_err(&pdev->dev, "insufficient IO resources\n");
 		ret = -ENOENT;
 		goto fail_gpio_res;
 	}
 
-	
+	/* Configure 5 wire GPIOs */
 	ret = wcnss_gpios_config(penv->gpios_5wire, true);
 	if (ret) {
 		dev_err(&pdev->dev, "WCNSS gpios config failed.\n");
 		goto fail_gpio_res;
 	}
 
-	
+	/* power up the WCNSS */
 	ret = wcnss_wlan_power(&pdev->dev, &penv->wlan_config,
 					WCNSS_WLAN_SWITCH_ON);
 	if (ret) {
@@ -382,7 +384,7 @@ wcnss_trigger_config(struct platform_device *pdev)
 		goto fail_power;
 	}
 
-	
+	/* trigger initialization of the WCNSS */
 	penv->pil = pil_get(WCNSS_PIL_DEVICE);
 	if (IS_ERR(penv->pil)) {
 		dev_err(&pdev->dev, "Peripheral Loader failed on WCNSS.\n");
@@ -391,7 +393,7 @@ wcnss_trigger_config(struct platform_device *pdev)
 		goto fail_pil;
 	}
 
-	
+	/* allocate resources */
 	penv->mmio_res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
 							"wcnss_mmio");
 	penv->tx_irq_res = platform_get_resource_byname(pdev, IORESOURCE_IRQ,
@@ -405,7 +407,7 @@ wcnss_trigger_config(struct platform_device *pdev)
 		goto fail_res;
 	}
 
-	
+	/* register sysfs entries */
 	ret = wcnss_create_sysfs(&pdev->dev);
 	if (ret)
 		goto fail_sysfs;
@@ -461,28 +463,32 @@ static struct miscdevice wcnss_misc = {
 	.name = DEVICE,
 	.fops = &wcnss_node_fops,
 };
-#endif 
+#endif /* ifndef MODULE */
 
+//HTC_CSP_START
 #ifdef CONFIG_PERFLOCK
 #include <mach/perflock.h>
 struct perf_lock qcom_wlan_perf_lock;
 EXPORT_SYMBOL(qcom_wlan_perf_lock);
-#endif 
+#endif /* CONFIG_PERFLOCK */
+//HTC_CSP_END
 
 static int __devinit
 wcnss_wlan_probe(struct platform_device *pdev)
 {
-	
+	/* verify we haven't been called more than once */
 	if (penv) {
 		dev_err(&pdev->dev, "cannot handle multiple devices.\n");
 		return -ENODEV;
 	}
 
+//HTC_CSP_START
 #ifdef CONFIG_PERFLOCK
         perf_lock_init(&qcom_wlan_perf_lock, TYPE_PERF_LOCK, PERF_LOCK_HIGHEST, "qcom-wifi-perf");
-#endif 
+#endif /* CONFIG_PERFLOCK */
+//HTC_CSP_END
 
-	
+	/* create an environment to track the device */
 	penv = kzalloc(sizeof(*penv), GFP_KERNEL);
 	if (!penv) {
 		dev_err(&pdev->dev, "cannot allocate device memory.\n");
@@ -492,11 +498,26 @@ wcnss_wlan_probe(struct platform_device *pdev)
 
 #ifdef MODULE
 
+	/*
+	 * Since we were built as a module, we are running because
+	 * the module was loaded, therefore we assume userspace
+	 * applications are available to service PIL, so we can
+	 * trigger the WCNSS configuration now
+	 */
 	pr_info(DEVICE " probed in MODULE mode\n");
 	return wcnss_trigger_config(pdev);
 
 #else
 
+	/*
+	 * Since we were built into the kernel we'll be called as part
+	 * of kernel initialization.  We don't know if userspace
+	 * applications are available to service PIL at this time
+	 * (they probably are not), so we simply create a device node
+	 * here.  When userspace is available it should touch the
+	 * device so that we know that WCNSS configuration can take
+	 * place
+	 */
 	pr_info(DEVICE " probed in built-in mode\n");
 	return misc_register(&wcnss_misc);
 

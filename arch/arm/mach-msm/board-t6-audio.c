@@ -24,13 +24,13 @@
 #include "../sound/soc/msm/msm-pcm-routing.h"
 #include "../sound/soc/msm/msm-compr-q6.h"
 
-#if defined(CONFIG_MACH_DUMMY)
+#if defined(CONFIG_MACH_T6_UL)
 #include "board-t6ul.h"
 #elif defined(CONFIG_MACH_T6_WL)
 #include "board-t6wl.h"
-#elif defined(CONFIG_MACH_DUMMY)
+#elif defined(CONFIG_MACH_T6_WHL)
 #include "board-t6whl.h"
-#elif defined(CONFIG_MACH_DUMMY)
+#elif defined(CONFIG_MACH_T6_UHL)
 #include "board-t6uhl.h"
 #endif
 
@@ -49,7 +49,7 @@ static int t6_get_hw_component(void)
 
 static int t6_enable_digital_mic(void)
 {
-	int ret = 3; 
+	int ret = 3; /* Use knowles single membrane MIC for T6 series */
 	printk(KERN_INFO "t6_enable_digital_mic[ret: %d]:skuid=0x%x, system_rev=%x\n", ret, skuid, system_rev);
 	return ret;
 }
@@ -72,6 +72,13 @@ int apq8064_get_24b_audio(void)
 	return 1;
 }
 
+/*
+* For T6 sku, such as DUG/DCG/DTU, NXP tfa9887's power source has been
+* changed to PMIC L23 (VREG_SPK_1V8).
+* For T6 sku, VREG_SPK_1V8 uses LVS2 instead. And also be noticed, LVS don't
+* need to set voltage.
+*
+*/
 static int t6_aud_speaker_vdd_enable(char *power_vreg_name, unsigned volt)
 {
 	struct regulator *aud_spk_amp_power;
@@ -96,6 +103,7 @@ static int t6_aud_speaker_vdd_enable(char *power_vreg_name, unsigned volt)
 		return -ENODEV;
 	}
 
+/* T6 all boards use LVS2 & LVS don't need to set voltage */
 #if 0
 	ret = regulator_set_voltage(aud_spk_amp_power, power_vreg_volt, power_vreg_volt);
 	if (ret < 0) {
@@ -192,7 +200,7 @@ static int __init t6_audio_init(void)
 	htc_register_pcm_routing_ops(&rops);
 	htc_register_compr_q6_ops(&cops);
 	acoustic_register_ops(&acoustic);
-	
+	//All T6 boards use LVS2
 	t6_aud_vdd_enable("aud_vdd_L9", 3000000);
 	t6_aud_speaker_vdd_enable("tfa9887_vdd_LVS2", 1800000);
 

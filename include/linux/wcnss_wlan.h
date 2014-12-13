@@ -54,4 +54,4 @@ void wcnss_reset_intr(void);
 #define wcnss_wlan_get_drvdata(dev) dev_get_drvdata(dev)
 #define wcnss_wlan_set_drvdata(dev, data) dev_set_drvdata((dev), (data))
 
-#endif 
+#endif /* _WCNSS_WLAN_H_ */

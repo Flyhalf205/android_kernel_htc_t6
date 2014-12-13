@@ -909,7 +909,7 @@ static int ehci_hsic_int_latency(struct usb_hcd *hcd, int latency)
 	if (latency < 0 || latency > 6)
 		return -EINVAL;
 
-#if defined(CONFIG_MACH_M7_WLV)
+#if defined(CONFIG_MACH_DUMMY)
 	if (latency == 6)
 		latency = 5;
 #endif
@@ -2206,7 +2206,7 @@ static int __devinit ehci_hsic_msm_probe(struct platform_device *pdev)
 
 	mehci->ehci.max_log2_irq_thresh = 6;
 
-#if defined(CONFIG_MACH_M7_WLV)
+#if defined(CONFIG_MACH_DUMMY)
 	mehci->ehci.max_log2_irq_thresh	= 5;
 #endif
 
