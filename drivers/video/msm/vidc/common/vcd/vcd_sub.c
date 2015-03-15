@@ -936,7 +936,7 @@ struct vcd_buffer_entry *vcd_find_buffer_pool_entry
 		return NULL;
 	}
 
-	for (i = 0; i <= pool->count && !found; i++) {
+	for (i = 1; i <= pool->count && !found; i++) {
 		if (pool->entries[i].virtual == addr)
 			found = true;
 
@@ -1571,6 +1571,7 @@ u32 vcd_submit_frame(struct vcd_dev_ctxt *dev_ctxt,
 				vcd_update_decoder_perf_level(dev_ctxt,
 				   res_trk_estimate_perf_level(perf_level));
 				ddl_reset_avg_dec_time(cctxt->ddl_handle);
+				ddl_reset_core_time_variables(DEC_OP_TIME);
 			} else
 				VCD_MSG_ERROR("%s(): retrieve curr_perf_level"
 						"returned FALSE\n", __func__);
@@ -3042,6 +3043,10 @@ void vcd_send_flush_done(struct vcd_clnt_ctxt *cctxt, u32 status)
 		cctxt->callback(VCD_EVT_RESP_FLUSH_OUTPUT_DONE,
 			status, NULL, 0, cctxt, cctxt->client_data);
 		cctxt->status.mask &= ~VCD_FLUSH_OUTPUT;
+		if (!ddl_get_core_decode_proc_time(cctxt->ddl_handle)) {
+			ddl_reset_avg_dec_time(cctxt->ddl_handle);
+			ddl_reset_core_time_variables(DEC_OP_TIME);
+		}
 	}
 }
 

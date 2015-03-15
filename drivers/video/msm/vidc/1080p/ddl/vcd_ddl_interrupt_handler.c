@@ -340,8 +340,10 @@ static u32 ddl_decoder_seq_done_callback(struct ddl_context *ddl_context,
 		parse_hdr_crop_data(ddl, &seq_hdr_info);
 		if (decoder->codec.codec == VCD_CODEC_H264 &&
 			seq_hdr_info.level > VIDC_1080P_H264_LEVEL4) {
+/* HTC START */
 			DDL_MSG_HIGH("Warning: H264 LEVEL(%d) > LEVEL4",
 				seq_hdr_info.level);
+/* HTC END */
 		}
 		ddl_set_default_decoder_buffer_req(decoder, false);
 		if (decoder->header_in_start) {
@@ -1865,7 +1867,7 @@ static void ddl_handle_slice_done_slice_batch(struct ddl_client_context *ddl)
 	DDL_MSG_LOW(" after get no of slices = %d\n", num_slices_comp);
 	if (slice_output == NULL) {
 		DDL_MSG_ERROR(" slice_output is NULL\n");
-		return; 
+		return; /* Bail out */
 	}
 	encoder->slice_delivery_info.num_slices_enc += num_slices_comp;
 	if (vidc_msg_timing) {

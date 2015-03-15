@@ -1867,7 +1867,7 @@ static int vid_dec_get_next_msg(struct video_client_ctx *client_ctx,
 		DBG("rc = %d, stop_msg = %u\n", rc, client_ctx->stop_msg);
 		return rc;
 	} else if (client_ctx->stop_msg) {
-		DBG("rc = %d, stop_msg = %u\n", rc, client_ctx->stop_msg);
+		ERR("rc = %d, stop_msg = %u\n", rc, client_ctx->stop_msg);
 		return -EIO;
 	}
 
@@ -2246,7 +2246,7 @@ static long vid_dec_ioctl(struct file *file,
 	}
 	case VDEC_IOCTL_STOP_NEXT_MSG:
 	{
-		DBG("VDEC_IOCTL_STOP_NEXT_MSG\n");
+		ERR("VDEC_IOCTL_STOP_NEXT_MSG\n");
 		client_ctx->stop_msg = 1;
 		wake_up(&client_ctx->msg_wait);
 		break;

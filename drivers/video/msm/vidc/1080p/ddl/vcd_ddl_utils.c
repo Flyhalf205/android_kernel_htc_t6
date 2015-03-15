@@ -455,9 +455,11 @@ void ddl_calc_core_proc_time(const char *func_name, u32 index,
 			decoder = &(ddl->codec_data.decoder);
 			decoder->dec_time_sum = decoder->dec_time_sum +
 				ddl_t2 - time_data->ddl_t1;
-			if (time_data->ddl_count == 5)
+			if (time_data->ddl_count == 5) {
 				decoder->avg_dec_time =
 					decoder->dec_time_sum / 3;
+				DDL_MSG_INFO("avg_dec_time %d\n", decoder->avg_dec_time);
+			}
 		}
 		time_data->ddl_t1 = 0;
 	}

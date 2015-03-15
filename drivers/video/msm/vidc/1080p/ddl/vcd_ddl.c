@@ -498,12 +498,12 @@ u32 ddl_encode_frame(u32 *ddl_handle,
 	struct ddl_encoder_data *encoder =
 		&ddl->codec_data.encoder;
 	u32 vcd_status = VCD_S_SUCCESS;
-	
+	/* HTC_START (klockwork issue)*/
 	if (!ddl) {
 		DDL_MSG_ERROR("ddl_enc_frame:Bad_handle");
 		return VCD_ERR_BAD_HANDLE;
 	}
-	
+	/* HTC_END */
 	DDL_MSG_LOW("%s: transc = 0x%x", __func__, (u32)ddl->client_data);
 	if (encoder->slice_delivery_info.enable) {
 		return ddl_encode_frame_batch(ddl_handle,
