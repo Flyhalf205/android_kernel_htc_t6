@@ -15,7 +15,7 @@
 #include <linux/ioport.h>
 #include <linux/platform_device.h>
 #include <linux/bootmem.h>
-#include <linux/ion.h>
+#include <linux/msm_ion.h>
 #include <asm/mach-types.h>
 #include <mach/msm_memtypes.h>
 #include <mach/board.h>
@@ -34,9 +34,9 @@
 #include "../../../../drivers/video/msm/mdp4.h"
 #include <mach/msm_xo.h>
 
-#if defined(CONFIG_MACH_DUMMY)
+#if defined(CONFIG_MACH_T6_UL)
 #include "board-t6ul.h"
-#elif defined(CONFIG_MACH_T6_WL)
+#elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6wl.h"
 #elif defined(CONFIG_MACH_DUMMY)
 #include "board-t6whl.h"
@@ -88,18 +88,8 @@ static int t6_detect_panel(const char *name)
 	return -ENODEV;
 }
 
-#ifdef CONFIG_UPDATE_LCDC_LUT
-int update_preset_lcdc_lut(void)
-{
-	return 0;
-}
-#endif
-
 static struct msm_fb_platform_data msm_fb_pdata = {
 	.detect_client = t6_detect_panel,
-#ifdef CONFIG_UPDATE_LCDC_LUT
-	.update_lcdc_lut = update_preset_lcdc_lut,
-#endif
 };
 
 static struct platform_device msm_fb_device = {
@@ -794,7 +784,7 @@ static struct msm_panel_common_pdata mdp_pdata = {
 	.cont_splash_enabled = 0x00,
 	.mdp_gamma = t6_mdp_gamma,
 	.mdp_iommu_split_domain = 1,
-	.mdp_max_clk = 200000000,
+	.mdp_max_clk = 266667000,
 };
 
 static char wfd_check_mdp_iommu_split_domain(void)
@@ -844,6 +834,10 @@ static  struct pm8xxx_mpp_config_data MPP_DISABLE = {
 	.level          = PM8921_MPP_DIG_LEVEL_S4,
 	.control		= PM8XXX_MPP_DOUT_CTRL_LOW,
 };
+
+#ifdef CONFIG_HTC_PNPMGR
+extern void set_screen_status(bool onoff);
+#endif
 
 static int mipi_dsi_panel_power(int on)
 {
@@ -976,6 +970,13 @@ static int mipi_dsi_panel_power(int on)
 			return -ENODEV;
 		}
 	}
+
+#ifdef CONFIG_HTC_PNPMGR
+	if (on)
+		set_screen_status(true);
+	else
+		set_screen_status(false);
+#endif
 
 	return 0;
 }
