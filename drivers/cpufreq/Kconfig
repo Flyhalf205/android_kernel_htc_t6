@@ -115,6 +115,12 @@ config CPU_FREQ_DEFAULT_GOV_LIONHEART
 	help
 	 Use the CPUFreq governor 'lionheart' as default.
 
+config CPU_FREQ_DEFAULT_GOV_SMARTMAX
+        bool "smartmax"
+        select CPU_FREQ_GOV_SMARTMAX
+        help
+         Use the CPUFreq governor 'smartmax' as default
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -208,6 +214,12 @@ config CPU_FREQ_GOV_LIONHEART
 	 Use the CPUFreq governor 'lionheart' as default.
 
 	  If in doubt, say N.
+
+config CPU_FREQ_GOV_SMARTMAX
+        tristate "'smartmax' cpufreq policy governor"
+        select CPU_FREQ_TABLE
+        help
+         'smartmax' combined ondemand and smartass2
 
 config CPU_FREQ_GOV_CONSERVATIVE
 	tristate "'conservative' cpufreq governor"
