@@ -223,6 +223,7 @@ static int get_fw_version(struct i2c_client *client);
 static void propagate_report(struct data *ts, int status, u16 *report);
 static int get_report(struct data *ts, u16 report_id, ulong timeout);
 static void release_report(struct data *ts);
+static bool scr_suspended = false;
 
 #if 0
 static u16 binary_search(const u16 *array, u16 len, u16 val);
@@ -232,6 +233,14 @@ static u16 max1187x_sqrt(u32 num);
 
 static u8 bootloader;
 static u8 init_state;
+
+extern uint8_t touchscreen_is_on(void)
+{
+	if (scr_suspended == false) {
+		return 1;
+	}
+	return 0;
+}
 
 static char *keycode_check(int keycode)
 {
